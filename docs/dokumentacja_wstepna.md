@@ -2,6 +2,8 @@
 
 **Maksym Bieńkowski** (<01178511@pw.edu.pl>) | Jędrzej Grabski | Aleksander Drwal | Tomasz Kowalski
 
+14.12.2024
+
 ## 1. Temat i treść zadania
 
 ### Program obsługujący prosty protokół P2P (Peer-to-Peer)
@@ -47,27 +49,27 @@
 
 1. **Dodawanie zasobów lokalnych:**
 
-   - Pobranie pliku binarnego z systemu plików lokalnego.
-   - Rejestracja nazwy zasobu w katalogu lokalnym.
+- Udostępnienie pliku z lokalnego systemu plików hosta.
+   <!-- - Rejestracja nazwy zasobu w katalogu lokalnym. TODO: what did bro mean by this? -->
 
 2. **Rozgłaszanie lokalnych zasobów:**
 
-   - Periodyczne wysyłanie listy dostępnych zasobów przy użyciu protokołu UDP w trybie broadcast.
+- Periodyczne wysyłanie listy dostępnych zasobów przy użyciu protokołu UDP w trybie broadcast.
+- Powiadomienie o dostępności zasobu w odpowiedzi na zapytanie.
 
 3. **Pobieranie zasobu:**
 
-   - Otrzymanie nazwy zasobu od użytkownika.
-   - Zapytanie zdalnych hostów o lokalizację zasobu.
-   - Transfer zasobu z wybranego hosta przy użyciu UDP.
+- Wysłanie zapytania o zasób do pozostałych hostów.
+- Transfer zasobu z wybranego hosta przy użyciu UDP.
 
 4. **Obsługa sytuacji wyjątkowych:**
 
-   - Ponawianie zapytań w przypadku utraty datagramów.
-   - Informowanie użytkownika o niepowodzeniach transferu.
+- Ponawianie zapytań w przypadku utraty datagramów, stosowanie prostego rozwiązania ACK.
+- Informowanie użytkownika o niepowodzeniach transferu.
 
 ---
 
-## 4. Krótki opis funkcjonalny ("black-box")
+## 3. Krótki opis funkcjonalny ("black-box")
 
 ### Użytkownik
 
