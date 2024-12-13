@@ -88,34 +88,34 @@
 
 ## 5. Opis i analiza protokołów komunikacyjnych
 
-### Wykorzystany protokół: **UDP (User Datagram Protocol)**
+### Wykorzystany protokół: UDP
 
-1. **Rozgłaszanie zasobów:**
+1. Rozgłaszanie zasobów:
 
-   - **Format komunikatu:**
+- Format komunikatu:
 
-     | Pole           | Typ      | Opis                         |
-     | -------------- | -------- | ---------------------------- |
-     | Typ            | uint8_t  | 1 = Rozgłoszenie             |
-     | Liczba zasobów | uint16_t | Liczba zasobów w komunikacie |
-     | Nazwa zasobu   | string   | Unikalna nazwa zasobu        |
+| Pole           | Typ      | Opis                         |
+| -------------- | -------- | ---------------------------- |
+| Typ            | uint8_t  | Poniżej                      |
+| Liczba zasobów | uint16_t | Liczba zasobów w komunikacie |
+| Nazwa zasobu   | string   | Unikalna nazwa zasobu        |
 
-   - **Diagram komunikacji:**
+- Diagram komunikacji:
 
-   ![Broadcast diagram](./broadcast.png)
+![Broadcast diagram]./broadcast.png
 
-2. **Pobieranie zasobu:**
+2. Pobieranie zasobu:
 
-   - **Format zapytania:**
+- Format zapytania:
 
-     | Pole         | Typ     | Opis                  |
-     | ------------ | ------- | --------------------- |
-     | Typ          | uint8_t | 2 = Zapytanie         |
-     | Nazwa zasobu | string  | Unikalna nazwa zasobu |
+| Pole         | Typ     | Opis                  |
+| ------------ | ------- | --------------------- |
+| Typ          | uint8_t | 2 = Zapytanie         |
+| Nazwa zasobu | string  | Unikalna nazwa zasobu |
 
-   - **Diagram komunikacji:**
+- Diagram komunikacji:
 
-   ![Transfer diagram](./transfer.png)
+![Transfer diagram](./transfer.png)
 
 ---
 
@@ -123,7 +123,7 @@
 
 ### Moduły
 
-1. **Moduł zarządzania zasobami:**
+1. *Moduł zarządzania zasobami:*
 
    - Obsługuje dodawanie, usuwanie i przegląd zasobów lokalnych.
 
