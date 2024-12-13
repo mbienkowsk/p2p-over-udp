@@ -73,15 +73,15 @@
 
 ### Użytkownik
 
-- Może dodawać zasoby do katalogu lokalnego.
+- Może udostępniać zasoby ze swojego systemu plików.
 - Może wywołać pobieranie zasobu o podanej nazwie z określonego hosta.
-- Może przeglądać lokalnie dostępne zasoby.
+- Może przeglądać udostępniane przez niego zasoby.
 
 ### Program
 
-- Rozgłasza informacje o lokalnych zasobach.
+- Rozgłasza informacje o udostępnianych zasobach.
 - Obsługuje zapytania o zasoby od zdalnych hostów.
-- Przesyła i odbiera zasoby w trybie UDP.
+- Przesyła i odbiera zasoby.
 - Zarządza transferami bez blokowania interfejsu użytkownika.
 
 ---
