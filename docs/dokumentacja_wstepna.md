@@ -88,34 +88,44 @@
 
 ## 5. Opis i analiza protokołów komunikacyjnych
 
-### Wykorzystany protokół: UDP
+Bazowy protokół - UDP
 
-1. Rozgłaszanie zasobów:
+### Struktura nagłówka pakietu
 
-- Format komunikatu:
+- MSG_TYPE (unit8_t)
+  - `RESOURCE_ANNOUNCE` - ogłoszenie lokalnie posiadanych zasobów
+  - `RESOURCE_REQUEST` - prośba o udostępnienie określonego zasobu
+   od konkretnego hosta
+  - `RESOURCE_QUERY` -  rozgłoszenie zapytania o określony zasób do wszyskich hostów
+  - `RESOURCE_DATA` - przesłanie zasobu do węzła, który go zażądał
+  - `DATA_ACK` - potwierdzenie odebrania zasobu przez węzeł pobierający.
+  Jeśli nadawca nie otrzyma potwierdzenia w określonym czasie, powtarza wysyłkę
+  `RESOURCE_DATA`
+  - `RESOURCE_OFFER` - wysyłany w odpowiedzi na `RESOURCE_QUERY`, potwierdza
+  posiadanie zasobu, o który było zadane pytanie
 
-| Pole           | Typ      | Opis                         |
-| -------------- | -------- | ---------------------------- |
-| Typ            | uint8_t  | Poniżej                      |
-| Liczba zasobów | uint16_t | Liczba zasobów w komunikacie |
-| Nazwa zasobu   | string   | Unikalna nazwa zasobu        |
+- RESOURCE_NAME - uint8_t[128]
+  - nazwa zasobu, tablica bajtów UTF-8, zakończona bajtem `\0`. Maksymalna
+  długość nazwy zasobu wynosi w tym wypadku 127 bajtów.
+
+- RESOURCE_SIZE (uint32_t) - długość zasobu w bajtach, wartość ma znaczenie
+wyłącznie w przypadku pakietu `RESOURCE_DATA`
+
+Za maksymalny rozmiar wysyłalnych danych uznajmy $65507 - 8 - 128 * 8 - 32  = 64443$ bajty.
+
+#### Rozgłaszanie zasobów
 
 - Diagram komunikacji:
 
-![Broadcast diagram]./broadcast.png
+![Broadcast diagram](./broadcast.png)
 
-2. Pobieranie zasobu:
-
-- Format zapytania:
-
-| Pole         | Typ     | Opis                  |
-| ------------ | ------- | --------------------- |
-| Typ          | uint8_t | 2 = Zapytanie         |
-| Nazwa zasobu | string  | Unikalna nazwa zasobu |
+#### Pobieranie zasobu
 
 - Diagram komunikacji:
 
 ![Transfer diagram](./transfer.png)
+
+#### TODO - pytanie o zasób, odpowiedź (offer)
 
 ---
 
