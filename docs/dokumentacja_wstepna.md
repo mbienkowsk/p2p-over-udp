@@ -1,28 +1,47 @@
-# Wstępna Dokumentacja Projektu: Implementacja Prostego Protokółu P2P
+# PSI 24Z - Wstępna dokumentacja projektu
 
-## 1. Temat zadania
+**Maksym Bieńkowski** (<01178511@pw.edu.pl>) | Jędrzej Grabski | Aleksander Drwal | Tomasz Kowalski
 
-**Implementacja prostego protokołu P2P (Peer-to-Peer).**
+## 1. Temat i treść zadania
 
----
+### Program obsługujący prosty protokół P2P (Peer-to-Peer)
 
-## 2. Treść zadania
+#### Założenia
 
-Napisać program obsługujący prosty protokół P2P, spełniający następujące wymagania:
+- Zasób to obiekt z danymi binarnymi identyfikowany pewną nazwą. Za takie same zasoby uważa się zasoby o takich samych nazwach.
+- Rozmiar zasobu jest znaczny (tj. większy od jednorazowego transferu sieciowego).
+- Początkowo dany zasób znajduje się w jednym hoście, a następnie może być propagowany do innych hostów w ramach inicjowanego przez użytkownika “ręcznie” transferu. Raz pobrany zasób zostaje zachowany jako kopia.
+- Po pewnym czasie działania systemu ten sam zasób może znajdować się w kilku hostach sieci.
+- Program ma informować o posiadanych lokalnie (tj. w danym węźle) zasobach i umożliwiać ich pobranie.
 
-1. **Zasób**: Obiekt z danymi binarnymi identyfikowany nazwą (zasoby o tych samych nazwach są traktowane jako identyczne). Rozmiar zasobu mieści się w jednym datagramie protokołu UDP.
-2. **Funkcjonalność**:
-   - Użytkownik może dodawać zasoby z systemu plików lokalnego.
-   - Pobieranie zasobów o zadanej nazwie ze wskazanego hosta.
-   - Rozgłaszanie informacji o posiadanych lokalnie zasobach przy użyciu protokołu UDP.
-3. **Przetwarzanie zasobów**:
-   - Zasoby są propagowane poprzez kopiowanie (kopia traktowana równoznacznie z oryginałem).
-   - System musi obsługiwać sytuacje wyjątkowe, np. przerwane transmisje.
-4. **Interfejs użytkownika**: Tekstowy, wspierający współbieżne transfery zasobów.
+#### Funkcjonalność programu
 
----
+- Dodawanie nowych zasobów przez użytkownika – wprowadzanie z lokalnego systemu plików.
+- Pobieranie zasobów:
+  - Użytkownik może pobrać konkretny zasób po nazwie ze zdalnego hosta (jeden zasób na raz).
+  - Użytkownik decyduje, z którego hosta dany zasób zostanie pobrany.
+- Rozgłaszanie informacji o posiadanych lokalnie zasobach.
 
-## 3. Interpretacja treści zadania
+#### Dodatkowe założenia
+
+- Zasób pobrany do lokalnego hosta jest kopią oryginału. Kopia jest traktowana tak samo jak oryginał (są nierozróżnialne), tj.:
+  - Istnienie kopii jest rozgłaszane w taki sam sposób jak istnienie oryginału.
+- Program powinien obsługiwać różne sytuacje wyjątkowe, np. przerwanie transmisji spowodowane błędem sieciowym.
+- Lokalizacja zasobów odbywa się poprzez rozgłaszanie:
+  - Wskazówka: użyć protokołu UDP, ustawić opcje gniazda `SO_BROADCAST`, wykorzystać adresy IP rozgłaszające (same bity “1” w części hosta).
+
+#### Interfejs użytkownika
+
+- Wystarczy prosty interfejs tekstowy.
+- Interfejs powinien obsługiwać współbieżny transfer zasobów – tj. nie powinien się blokować w oczekiwaniu na przesłanie danego zasobu.
+
+##### Wariant zadania W13/W22
+
+- całość komunikacji (przesyłania zasobu) zrealizować na UDP, dodatkowo dla uproszczenia można przyjąć,
+że zasób mieści się w całości w jednym datagramie (datagram danych może być zgubiony – należy to uwzględnić)
+- implementacja w C/C++
+
+## 2. Interpretacja treści zadania
 
 **Główne funkcje programu:**
 
@@ -50,13 +69,13 @@ Napisać program obsługujący prosty protokół P2P, spełniający następując
 
 ## 4. Krótki opis funkcjonalny ("black-box")
 
-### Użytkownik:
+### Użytkownik
 
 - Może dodawać zasoby do katalogu lokalnego.
 - Może wywołać pobieranie zasobu o podanej nazwie z określonego hosta.
 - Może przeglądać lokalnie dostępne zasoby.
 
-### Program:
+### Program
 
 - Rozgłasza informacje o lokalnych zasobach.
 - Obsługuje zapytania o zasoby od zdalnych hostów.
@@ -100,7 +119,7 @@ Napisać program obsługujący prosty protokół P2P, spełniający następując
 
 ## 6. Planowany podział na moduły
 
-### Moduły:
+### Moduły
 
 1. **Moduł zarządzania zasobami:**
 
@@ -119,27 +138,27 @@ Napisać program obsługujący prosty protokół P2P, spełniający następując
 
    - Zarządza retransmisją utraconych datagramów i obsługą błędów.
 
-### Rysunek struktury:
+### Rysunek struktury
 
 ## ![Structure drawing](./structure.png)
 
 ## 7. Zarys koncepcji implementacji
 
-### Język programowania:
+### Język programowania
 
 - **C++**
 
-### Biblioteki:
+### Biblioteki
 
 - **Boost.Asio**: Obsługa gniazd sieciowych i operacji asynchronicznych.
 - **STL**: Przechowywanie i zarządzanie danymi lokalnymi.
 
-### Narzędzia:
+### Narzędzia
 
 - **CMake**: System budowy projektu.
 - **GCC/Clang**: Kompilator.
 
-### Ogólne podejście do implementacji:
+### Ogólne podejście do implementacji
 
 1. Klasa `Resource` reprezentująca zasób.
 2. Implementacja klasy `NetworkManager` do obsługi rozgłaszania i transferów.
