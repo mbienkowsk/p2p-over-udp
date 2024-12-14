@@ -47,27 +47,106 @@
 
 **Główne funkcje programu:**
 
-1. **Dodawanie zasobów lokalnych:**
+1. **Udostępnianie zasobów lokalnych:**
 
-- Udostępnienie pliku z lokalnego systemu plików hosta.
-   <!-- - Rejestracja nazwy zasobu w katalogu lokalnym. TODO: what did bro mean by this? -->
+- Na urządzeniu hosta istnieje folder roboczy programu, którego zawartość będzie udostępniana innym.
+- Udostępnienie zasobu jest równoznaczne z umieszczeniem go w tym katalogu.
 
-2. **Rozgłaszanie lokalnych zasobów:**
+```bash
+> share /path/to/resource 
+# równoznaczne ze skopiowaniem pliku /path/to/resource do /shared_folder
+```
+
+```bash
+user@machine launch-program
+
+Sharing resources from folder /shared_folder.
+Shared resources:
+file1.txt
+file2.txt
+```
+
+2. **Rozgłaszanie udostępnianych zasobów:**
 
 - Periodyczne wysyłanie listy dostępnych zasobów przy użyciu protokołu UDP w trybie broadcast.
-- Powiadomienie o dostępności zasobu w odpowiedzi na zapytanie.
 
-3. **Pobieranie zasobu:**
+3. **Aktualizacja dostępnych zasobów:**
 
-- Wysłanie zapytania o zasób do pozostałych hostów.
-- Transfer zasobu z wybranego hosta przy użyciu UDP.
+- Po otrzymaniu wiadomości broadcastowej z listą udostępnianych przez hosta A zasobów, host B aktualizuje
+listę dostępnych u A zasobów.
 
-4. **Obsługa sytuacji wyjątkowych:**
+```bash
+> list-resources
+
+file1.txt
+hosts: [host1, host2]
+
+# otrzymanie wiadomości o file2.txt od hosta 1
+> list-resources
+
+file1.txt
+hosts: [host1, host2]
+
+file2.txt
+hosts: [host1]
+```
+
+4. **Pobieranie zasobu:**
+
+- Transfer zasobu z wybranego hosta inicjowany przez użytkownika programu.
+- Plik pobierany jest do katalogu `shared_folder` i wiadomość o dostępności
+wysyłana jest przy następnym rozgłoszeniu.
+
+```bash
+> download file1.txt host1  
+
+Downloading file1.txt from host1...
+
+>
+
+Completed download of file1.txt from host1.
+Available at shared_folder/file1.txt
+```
+
+5. **Obsługa sytuacji wyjątkowych:**
 
 - Ponawianie zapytań w przypadku utraty datagramów, stosowanie prostego rozwiązania ACK.
 - Informowanie użytkownika o niepowodzeniach transferu.
 
----
+```bash
+> download file1.txt host1  
+
+Downloading file1.txt from host1...
+
+Error while downloading file1.txt: could not connect to host1. Retrying...
+Error while downloading file1.txt: could not connect to host1. Retrying...
+Error while downloading file1.txt: could not connect to host1. Retrying...
+Fatal: Error while downloading file1.txt: could not connect to host1. Retried 3 times.
+# Usunięcie użytkownika host1 z pamięci do otrzymania od niego kolejnego broadcastu
+```
+
+6. **Sprawdzenie listy dostępnych zasobów**
+
+- Po wpisaniu określonej komendy, wypisywane są adresy hostów wraz z udostępnianymi przez nich zasobami.
+
+```bash
+> list-resources
+
+file1.txt
+hosts: [host1, host2]
+
+file2.txt
+hosts: [host1, host3]
+```
+
+- Po wpisaniu innej komendy, wypisywane są adresy hostów udostępniających konkretny zasób.
+
+```shell
+> find file1.txt
+
+file1.txt
+hosts: [host1, host2]
+```
 
 ## 3. Krótki opis funkcjonalny ("black-box")
 
@@ -75,16 +154,17 @@
 
 - Może udostępniać zasoby ze swojego systemu plików.
 - Może wywołać pobieranie zasobu o podanej nazwie z określonego hosta.
-- Może przeglądać udostępniane przez niego zasoby.
+- Może przeglądać udostępniane przez określonego hosta zasoby.
+- Może przeglądać wszystkie dostępne w sieci zasoby.
+- Jest informowany o wystąpieniu błędów i niepowodzeń.
 
 ### Program
 
 - Rozgłasza informacje o udostępnianych zasobach.
-- Obsługuje zapytania o zasoby od zdalnych hostów.
+- Obsługuje prośby o przesłanie zasobów od innych hostów.
 - Przesyła i odbiera zasoby.
 - Zarządza transferami bez blokowania interfejsu użytkownika.
-
----
+- Informuje użytkownika o wystąpieniu błędów i niepowodzeń.
 
 ## 5. Opis i analiza protokołów komunikacyjnych
 
