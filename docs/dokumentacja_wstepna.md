@@ -1,3 +1,4 @@
+<!-- renderowanie: pandoc -o dokumentacja_wstepna.pdf dokumentacja_wstepna.md -V geometry:margin=0.5in -V lang=pl -f markdown+raw_tex -V graphics=true-->
 # PSI 24Z - Wstępna dokumentacja projektu
 
 **Maksym Bieńkowski** (<01178511@pw.edu.pl>) | Jędrzej Grabski | Aleksander Drwal | Tomasz Kowalski
