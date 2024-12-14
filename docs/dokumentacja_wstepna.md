@@ -194,8 +194,6 @@ ich periodyczne wysyłanie. Zgubienie pakietu `RESOURCE_REQUEST` obsługiwane je
 ponownego odpytywania n razy do otrzymania zasobu, co rozwiązuje także przypadek zgubienia
 datagramu `RESOURCE_DATA`.
 
-<!-- TODO: rysunek nagłówka -->
-
 ```cpp
 class PacketHeader {
 public:
@@ -211,7 +209,9 @@ public:
 };
 ```
 
-![Diagram nagłówka protokołu](header.png)
+<div style="text-align: center;">
+    <img src="./header.png" alt="Broadcast diagram" width="500">
+</div>
 
 ### Dane poza nagłówkiem
 
@@ -230,33 +230,41 @@ public:
 
 #### Przypisanie portu
 
-Zakładamy, że na potrzeby protokołu wszystkim hostom przypisany jest stały port.
+- Zakładamy, że na potrzeby protokołu wszystkim hostom przypisany jest stały port.
 
 ### Diagramy komunikacji
 
-#### Rozgłaszanie zasobów
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\textwidth]{broadcast.png}
+    \caption{Rozgłaszanie zasobów}
+\end{figure}
 
-<div style="text-align: center;">
-    <img src="./broadcast.png" alt="Broadcast diagram" width="500">
-</div>
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\textwidth]{no-fail.png}
+    \caption{Bezproblemowy przesył danych}
+\end{figure}
 
-#### Pobieranie zasobu, radzenie sobie z problemami przesyłu
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{max-retries.png}
+    \caption{Niemożnośc osiągnięcia hosta}
+\end{figure}
 
-<div style="text-align: center;">
-    <img src="./no-fail.png" alt="Transfer diagram" width="300">
-</div>
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\textwidth]{resource-fail.png}
+    \caption{Utrata prośby o zasób}
+\end{figure}
 
-<div style="text-align: center;">
-    <img src="./max-retries.png" alt="Transfer diagram" width="300">
-</div>
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\textwidth]{mixed-fail.png}
+    \caption{Utrata prośby i zasobu}
+\end{figure}
 
-<div style="text-align: center;">
-    <img src="./resource-fail.png" alt="Transfer diagram" width="300">
-</div>
-
-<div style="text-align: center;">
-    <img src="./mixed-fail.png" alt="Transfer diagram" width="300">
-</div>
+\clearpage
 
 ## 6. Planowany podział na moduły
 
