@@ -41,7 +41,7 @@
 
 - całość komunikacji (przesyłania zasobu) zrealizować na UDP, dodatkowo dla uproszczenia można przyjąć,
 że zasób mieści się w całości w jednym datagramie (datagram danych może być zgubiony – należy to uwzględnić)
-- implementacja w C/C++
+- implementacja w C++
 
 ## 2. Interpretacja treści zadania
 
@@ -126,6 +126,7 @@ Za maksymalny rozmiar wysyłalnych danych uznajmy $65507 - 8 - 128 * 8 - 32  = 6
 ![Transfer diagram](./transfer.png)
 
 #### Pytanie o zasób i odpowiedź
+
 - Diagram zapytania o zasób i odpowiedzi  
 
 ![Query diagram](./query.png)
