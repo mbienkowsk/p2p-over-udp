@@ -210,9 +210,11 @@ public:
 };
 ```
 
-<div style="text-align: center;">
-    <img src="./header.png" alt="Broadcast diagram" width="500">
-</div>
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\textwidth]{header.png}
+    \caption{Struktura nagłówka protokołu}
+\end{figure}
 
 ### Dane poza nagłówkiem
 
