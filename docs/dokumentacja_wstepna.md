@@ -311,5 +311,5 @@ W celu zapewnienia nieblokujących operacji IO zamierzamy zastosować wielowątk
 - dynamicznie powoływane wątki *workers* odpowiedzialne za pobieranie i przesyłanie zasobów
 
 Zamierzamy zastosować obiektowe podejście przy implementacji programu w celu testowalnego i wyraźnego
-podziału odpowiedzialności między komponenty. Testowanie poprawności implementacji przeprowadzone będzie
-przy pomocy jednostkowych i ręcznych testów.
+podziału odpowiedzialności między komponentami. Testowanie poprawności implementacji przeprowadzone będzie
+przy pomocy testów ręczych i jednostkowych.
