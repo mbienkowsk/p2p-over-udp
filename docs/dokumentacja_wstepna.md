@@ -172,77 +172,112 @@ Bazowy protokół - UDP
 
 ### Struktura nagłówka pakietu
 
-- MSG_TYPE (unit8_t)
-  - `RESOURCE_ANNOUNCE` - ogłoszenie lokalnie posiadanych zasobów
-  - `RESOURCE_REQUEST` - prośba o udostępnienie określonego zasobu
-   od konkretnego hosta
-  - `RESOURCE_QUERY` -  rozgłoszenie zapytania o określony zasób do wszyskich hostów
-  - `RESOURCE_DATA` - przesłanie zasobu do węzła, który go zażądał
-  - `DATA_ACK` - potwierdzenie odebrania zasobu przez węzeł pobierający.
-  Jeśli nadawca nie otrzyma potwierdzenia w określonym czasie, powtarza wysyłkę
-  `RESOURCE_DATA`
-  - `RESOURCE_OFFER` - wysyłany w odpowiedzi na `RESOURCE_QUERY`, potwierdza
-  posiadanie zasobu, o który było zadane pytanie
+PROT_VERSION (8 bitów)
 
-- RESOURCE_NAME - uint8_t[128]
-  - nazwa zasobu, tablica bajtów UTF-8, zakończona bajtem `\0`. Maksymalna
-  długość nazwy zasobu wynosi w tym wypadku 127 bajtów.
+- wersja protokołu
 
-- RESOURCE_SIZE (uint32_t) - długość zasobu w bajtach, wartość ma znaczenie
-wyłącznie w przypadku pakietu `RESOURCE_DATA`
+MSG_TYPE (8 bitów)
 
-Za maksymalny rozmiar wysyłalnych danych uznajmy $65507 - 8 - 128 * 8 - 32  = 64443$ bajty.
+- `RESOURCE_ANNOUNCE` - ogłoszenie lokalnie posiadanych zasobów
+- `RESOURCE_REQUEST` - prośba o udostępnienie określonego zasobu
+ od konkretnego hosta
+- `RESOURCE_DATA` - przesłanie zasobu do węzła, który go zażądał
+
+DATA_SIZE (32 bity)
+
+- długość danych spoza nagłówka w bajtach.
+
+Za maksymalny rozmiar wysyłalnych danych uznajmy $65507 - 1 - 1 - 4  = 65501$ bajtów (zgodnie z założeniem,
+że dane mieszczą się w jednym datagramie UDP na podstawie przydzielonego wariantu zadania).
+Uznajemy, że zgubienie pakietu rozgłoszeniowego nie jest warte obsłużenia ze względu na
+ich periodyczne wysyłanie. Zgubienie pakietu `RESOURCE_REQUEST` obsługiwane jest mechanizmem
+ponownego odpytywania n razy do otrzymania zasobu, co rozwiązuje także przypadek zgubienia
+datagramu `RESOURCE_DATA`.
+
+<!-- TODO: rysunek nagłówka -->
+
+```cpp
+class PacketHeader {
+public:
+    enum class MsgType : uint8_t {
+        RESOURCE_ANNOUNCE = 0,  // Ogłoszenie lokalnie posiadanych zasobów
+        RESOURCE_REQUEST = 1,   // Prośba o udostępnienie określonego zasobu od konkretnego hosta
+        RESOURCE_DATA = 2       // Przesłanie zasobu do węzła, który go zażądał
+    };
+
+    uint8_t PROT_VERSION; // Wersja protokołu (8 bitów)
+    MsgType MSG_TYPE;     // Message type (8 bitów)
+    uint32_t DATA_SIZE;   // Rozmiar danych do odebrania w bajtach (32 bitów)
+};
+```
+
+![Diagram nagłówka protokołu](header.png)
+
+### Dane poza nagłówkiem
+
+- W przypadku pakietu `RESOURCE_ANNOUNCE`, lista zakodowanych w ASCII nazw plików, separowanych przez bajt `\0`
+- W przypadku pakietu `RESOURCE_REQUEST`, nazwa żądanego pakietu zakończona bajtem `\0`
+- W przypadku pakietu `RESOURCE_DATA`, binarne dane zasobu o długości `DATA_SIZE`
+
+```cpp
+class Message {
+public:
+    PacketHeader header;           // Nagłówek pakietu
+    std::vector<uint8_t> data;     // Dane poza nagłówkiem (zmienny rozmiar)
+};
+
+```
+
+#### Przypisanie portu
+
+Zakładamy, że na potrzeby protokołu wszystkim hostom przypisany jest stały port.
+
+### Diagramy komunikacji
 
 #### Rozgłaszanie zasobów
 
-- Diagram komunikacji:
+<div style="text-align: center;">
+    <img src="./broadcast.png" alt="Broadcast diagram" width="500">
+</div>
 
-![Broadcast diagram](./broadcast.png)
+#### Pobieranie zasobu, radzenie sobie z problemami przesyłu
 
-#### Pobieranie zasobu
+<div style="text-align: center;">
+    <img src="./no-fail.png" alt="Transfer diagram" width="300">
+</div>
 
-- Diagram komunikacji:
+<div style="text-align: center;">
+    <img src="./max-retries.png" alt="Transfer diagram" width="300">
+</div>
 
-![Transfer diagram](./transfer.png)
+<div style="text-align: center;">
+    <img src="./resource-fail.png" alt="Transfer diagram" width="300">
+</div>
 
-#### Pytanie o zasób i odpowiedź
-
-- Diagram zapytania o zasób i odpowiedzi  
-
-![Query diagram](./query.png)
-
----
+<div style="text-align: center;">
+    <img src="./mixed-fail.png" alt="Transfer diagram" width="300">
+</div>
 
 ## 6. Planowany podział na moduły
 
-### Moduły
+1. Moduł zarządzania zasobami:
 
-1. *Moduł zarządzania zasobami:*
+- Obsługa dodawania, usuwania i przeglądu zasobów lokalnych
 
-   - Obsługuje dodawanie, usuwanie i przegląd zasobów lokalnych.
+2. Moduł sieciowy:
 
-2. **Moduł sieciowy:**
+- Rozgłaszanie zasobów
+- Obsługa zapytań i transferu zasobów
+- Zarządzanie retransmisją utraconych datagramów i obsługą błędów
 
-   - Rozgłaszanie zasobów.
-   - Obsługa zapytań i transferu zasobów przy użyciu UDP.
+3. Moduł interfejsu użytkownika:
 
-3. **Moduł interfejsu użytkownika:**
-
-   - Prosty tekstowy interfejs umożliwiający wykonywanie operacji przez użytkownika.
-
-4. **Moduł obsługi wyjątków:**
-
-   - Zarządza retransmisją utraconych datagramów i obsługą błędów.
-
-### Rysunek struktury
-
-## ![Structure drawing](./structure.png)
+- Prosty tekstowy interfejs umożliwiający wykonywanie operacji przez użytkownika, na wzór
+wcześniej pokazanych zrzutów z terminala
 
 ## 7. Zarys koncepcji implementacji
 
-### Język programowania
-
-- **C++**
+- Implementacja w języku C++
 
 ### Biblioteki
 
@@ -253,11 +288,17 @@ Za maksymalny rozmiar wysyłalnych danych uznajmy $65507 - 8 - 128 * 8 - 32  = 6
 
 - **CMake**: System budowy projektu.
 - **GCC/Clang**: Kompilator.
+- **Clang-tidy, clang-format**: Linter i formater.
+- **Google test**: Testy jednostkowe
 
 ### Ogólne podejście do implementacji
 
-1. Klasa `Resource` reprezentująca zasób.
-2. Implementacja klasy `NetworkManager` do obsługi rozgłaszania i transferów.
-3. Implementacja klasy `ResourceManager` do zarządzania zasobami.
-4. Implementacja klasy `ExceptionManager` do obługi wyjątków.
-5. Wdrożenie prostego interfejsu tekstowego opartego na pętlach zdarzeń.
+W celu zapewnienia nieblokujących operacji IO zamierzamy zastosować wielowątkową architekturę programu:
+
+- wątek odpowiedzialny za interakcję przez CLI z użytkownikiem
+- wątek odpowiedzialny za cykliczne wysyłanie rozgłoszeń
+- dynamicznie powoływane wątki *workers* odpowiedzialne za pobieranie i przesyłanie zasobów
+
+Zamierzamy zastosować obiektowe podejście przy implementacji programu w celu testowalnego i wyraźnego
+podziału odpowiedzialności między komponenty. Testowanie poprawności implementacji przeprowadzone będzie
+przy pomocy jednostkowych i ręcznych testów.
