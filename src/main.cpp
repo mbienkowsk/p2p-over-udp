@@ -1,3 +1,4 @@
+#include "resources/resource.h"
 #include "spdlog/spdlog.h"
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/post.hpp>
@@ -9,4 +10,5 @@ int main() {
   io.run();
 
   spdlog::info("Boost.asio is done");
+  spdlog::info(MESSAGE);
 }
