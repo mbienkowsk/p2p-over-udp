@@ -10,6 +10,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(SOURCES src/main.cpp)
 add_executable(${PROJECT_NAME} ${SOURCES})
 
+# Safety compilation flags 
+target_compile_options(${PROJECT_NAME} PRIVATE
+    -Wall
+    -Wextra
+    -Werror
+    -pedantic
+    -pedantic-errors
+)
+target_link_options(${PROJECT_NAME} PRIVATE
+    -fsanitize=address
+    -fsanitize=undefined
+    -fsanitize=leak
+)
+
 # Link boost
 find_package(Boost 1.73.0 COMPONENTS filesystem system REQUIRED)
 
