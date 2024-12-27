@@ -21,6 +21,14 @@ else()
     message(FATAL_ERROR "Boost not found")
 endif()
 
+# Link spdlog
+find_package(spdlog REQUIRED)
+if(spdlog_FOUND) 
+    target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog $<$<BOOL:${MINGW}>:ws2_32>)
+else() 
+    message(FATAL_ERROR "Spdlog not found")
+endif()
+
 
 # Link Googletest
 include(FetchContent)
