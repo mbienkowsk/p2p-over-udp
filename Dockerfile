@@ -4,8 +4,10 @@ FROM ubuntu:20.04 AS base
 # Set non-interactive frontend for apt-get
 ENV DEBIAN_FRONTEND=noninteractive
 
+RUN apt-get update -y
+
 # Install required packages: cmake, clang-format, clang-tidy, build tools, and curl for installing 'just'
-RUN apt-get update && apt-get install -y \
+RUN apt-get install -y \
     cmake \
     clang-format \
     clang-tidy \
@@ -14,6 +16,8 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     pkg-config \
     libboost-all-dev \
+    libspdlog-dev \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Install just and update path
@@ -28,9 +32,5 @@ COPY . .
 # Create and switch to the 'out' directory as per your Justfile
 RUN mkdir -p out
 WORKDIR /app/out
-
-###############################################################################
-# Define separate stages for each Just task
-###############################################################################
 
 ENTRYPOINT ["just"]

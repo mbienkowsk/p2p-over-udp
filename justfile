@@ -5,7 +5,8 @@ default:
 
 # Build the project in debug mode
 build:
-  cmake ..
+  cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=./Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+  make
 
 # Build and run the main executable
 run: build
@@ -20,6 +21,9 @@ format:
   clang-format -i ../src/**/*.cpp  ../src/**/*.h
 
 # Lint the code using clang-tidy
-just lint:
+lint: 
+  # Generate compile_commands.json
+  cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+  cp compile_commands.json ..
   clang-tidy ../src/**/*.cpp  ../src/**/*.h
 

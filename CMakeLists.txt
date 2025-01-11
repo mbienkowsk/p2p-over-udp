@@ -25,7 +25,7 @@ target_link_options(${PROJECT_NAME} PRIVATE
 )
 
 # Link boost
-find_package(Boost 1.73.0 COMPONENTS filesystem system REQUIRED)
+find_package(Boost 1.71.0 COMPONENTS filesystem system REQUIRED)
 
 # Include Boost headers
 if(Boost_FOUND)
