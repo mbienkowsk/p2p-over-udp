@@ -1,1 +1,4 @@
 .vscode
+out
+compile_commands.json
+.cache
