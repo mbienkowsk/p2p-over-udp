@@ -2,9 +2,7 @@
 #include "gtest/gtest.h"
 
 TEST(PacketHeader, SerializationReversesDeserialization) {
-  Header header;
-  header.ProtocolVersion = std::byte{1};
-  header.MessageType = Header::MsgType::RESOURCE_REQUEST;
+  Header header(Header::MsgType::RESOURCE_REQUEST);
 
   std::vector<std::byte> serialized = header.serialize();
   Header deserialized = Header::deserialize(serialized);

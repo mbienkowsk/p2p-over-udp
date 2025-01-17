@@ -3,7 +3,7 @@
 
 // Test serialization of a valid message
 TEST(MessageTest, SerializeValidMessage) {
-  auto header = Header(std::byte{1}, Header::MsgType::RESOURCE_DATA);
+  auto header = Header(Header::MsgType::RESOURCE_DATA);
 
   std::vector<std::byte> payload = {
       std::byte{0x48}, std::byte{0x65}, std::byte{0x6C}, std::byte{0x6C},
@@ -42,7 +42,7 @@ TEST(MessageTest, DeserializeValidMessage) {
   Message message = Message::deserialize(raw_data);
 
   // Verify header fields
-  EXPECT_EQ(message.header.ProtocolVersion, std::byte{1});
+  EXPECT_EQ(message.header.ProtocolVersion, 1);
   EXPECT_EQ(message.header.MessageType, Header::MsgType::RESOURCE_DATA);
 
   // Expected payload
@@ -53,7 +53,7 @@ TEST(MessageTest, DeserializeValidMessage) {
 
 // Test round-trip serialization/deserialization
 TEST(MessageTest, SerializeDeserializeRoundTrip) {
-  auto header = Header(std::byte{1}, Header::MsgType::RESOURCE_REQUEST);
+  auto header = Header(Header::MsgType::RESOURCE_REQUEST);
 
   std::vector<std::byte> payload = {
       std::byte{0x42}, std::byte{0x43}, std::byte{0x44} // Arbitrary payload

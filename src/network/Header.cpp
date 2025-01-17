@@ -4,7 +4,7 @@
 
 std::vector<std::byte> Header::serialize() const {
   std::vector<std::byte> raw_data;
-  raw_data.push_back(ProtocolVersion);
+  raw_data.push_back(std::byte(ProtocolVersion));
   raw_data.push_back(static_cast<std::byte>(MessageType));
   return raw_data;
 };
@@ -15,9 +15,7 @@ Header Header::deserialize(const std::vector<std::byte> &raw_data) {
     throw std::runtime_error("Invalid header length");
   }
 
-  Header header;
-  header.ProtocolVersion = raw_data[0];
-
+  const auto ProtocolVersion = std::to_integer<uint8_t>(raw_data[0]);
   // Extract the message type as an integer
   uint8_t messageType = std::to_integer<uint8_t>(raw_data[1]);
 
@@ -25,10 +23,7 @@ Header Header::deserialize(const std::vector<std::byte> &raw_data) {
     throw std::runtime_error("Invalid message type");
   }
 
-  // Assign the validated message type
-  header.MessageType = static_cast<Header::MsgType>(messageType);
-
-  return header;
+  return Header(static_cast<Header::MsgType>(messageType), ProtocolVersion);
 }
 
 bool Header::operator==(const Header &rhs) const {

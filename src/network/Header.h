@@ -16,7 +16,7 @@ public:
   };
 
   /// Version of the protocol
-  std::byte ProtocolVersion;
+  std::uint8_t ProtocolVersion;
 
   /// Type of the message (announce/request/data)
   MsgType MessageType;
@@ -34,6 +34,6 @@ public:
 
   bool operator==(const Header &rhs) const;
 
-  Header(std::byte ProtocolVersion, MsgType MessageType)
+  Header(MsgType MessageType, std::uint8_t ProtocolVersion = 1)
       : ProtocolVersion(ProtocolVersion), MessageType(MessageType) {}
 };
