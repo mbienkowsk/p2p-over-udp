@@ -61,6 +61,6 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 # Set unit test sources, add an executable for them and link them to gtest
-set(UNIT_TEST_SOURCES ${TEST_DIR}/ExampleTest.cpp ${TEST_DIR}/HeaderTest.cpp)
+set(UNIT_TEST_SOURCES ${TEST_DIR}/HeaderTest.cpp)
 add_executable(all-unit-tests ${UNIT_TEST_SOURCES})
 target_link_libraries(all-unit-tests PUBLIC gtest_main network_lib)
