@@ -19,6 +19,8 @@ public:
   Message *from_bytes(const std::vector<std::byte> &raw_data);
 
   Message(Header header) : header(header) {};
+
+  bool operator==(const Message &rhs) const = default;
 };
 
 /// Message broadcasted to announce available resources
@@ -42,6 +44,8 @@ public:
   /// Creates a message from a deserialized header and serialized payload
   static ResourceAnnounceMessage
   fromHeaderAndPayload(Header header, const std::vector<std::byte> &raw_data);
+
+  bool operator==(const ResourceAnnounceMessage &) const = default;
 };
 
 /// Message requesting a specific resource
@@ -65,6 +69,8 @@ public:
   /// Creates a message from a deserialized header and serialized payload
   static ResourceRequestMessage
   fromHeaderAndPayload(Header header, const std::vector<std::byte> &raw_data);
+
+  bool operator==(const ResourceRequestMessage &) const = default;
 };
 
 /// Message containing a requested resource
@@ -96,6 +102,8 @@ public:
   /// Creates a message from a deserialized header and serialized payload
   static ResourceDataMessage
   fromHeaderAndPayload(Header header, const std::vector<std::byte> &raw_data);
+
+  bool operator==(const ResourceDataMessage &) const = default;
 };
 
 #endif

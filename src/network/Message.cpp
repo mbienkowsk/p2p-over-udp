@@ -3,10 +3,6 @@
 #include <cstring>
 #include <stdexcept>
 
-#define UNIMPLEMENTED                                                          \
-  throw std::logic_error(std::string(__FUNCTION__) + " is not implemented "    \
-                                                     "yet.");
-
 /// Deserializes a message from a vector of bytes
 Message *Message::from_bytes(const std::vector<std::byte> &raw_data) {
   if (raw_data.size() < Header::SIZE) { // Minimum size for a valid header

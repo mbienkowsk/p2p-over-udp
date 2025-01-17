@@ -26,11 +26,6 @@ Header Header::deserialize(const std::vector<std::byte> &raw_data) {
   return Header(static_cast<MessageType>(messageType), protocolVersion);
 }
 
-bool Header::operator==(const Header &rhs) const {
-  return protocolVersion == rhs.protocolVersion &&
-         messageType == rhs.messageType;
-}
-
 /// Validates the message type
 bool Header::validateMessageType(uint8_t mt) { return mt <= 2; }
 
