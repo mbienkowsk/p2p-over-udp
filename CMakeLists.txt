@@ -10,10 +10,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/tests)
 
-add_library(network_lib ${SOURCE_DIR}/network/Header.cpp ${SOURCE_DIR}/network/Message.cpp)
+add_library(network_lib ${SOURCE_DIR}/network/Header.cpp ${SOURCE_DIR}/network/Message.cpp ${SOURCE_DIR}/serialization/Utils.cpp)
 
 # Define sources and executable
-set(SOURCES ${SOURCE_DIR}/main.cpp ${SOURCE_DIR}/network/Header.cpp)
+set(SOURCES ${SOURCE_DIR}/main.cpp ${SOURCE_DIR}/network/Header.cpp ${SOURCE_DIR}/serialization/Utils.cpp)
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 

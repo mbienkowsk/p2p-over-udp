@@ -1,5 +1,5 @@
 #include "Message.h"
-#include <algorithm>
+#include "../serialization/Utils.h"
 #include <cstring>
 #include <stdexcept>
 
@@ -33,35 +33,6 @@ Message *Message::from_bytes(const std::vector<std::byte> &raw_data) {
     return new ResourceDataMessage(
         ResourceDataMessage::fromHeaderAndPayload(header, payload));
   }
-}
-
-/// Converts a string to a vector of bytes for serialization
-std::vector<std::byte> serializeString(const std::string &str) {
-  std::vector<std::byte> bytes(str.size());
-  std::transform(str.begin(), str.end(), bytes.begin(),
-                 [](char c) { return static_cast<std::byte>(c); });
-  return bytes;
-}
-
-/// Deserializes a null-terminated string starting from a given
-/// offset and advances it by the length of the string and past the
-/// following separator.
-std::string deserializeString(const std::vector<std::byte> &data,
-                              size_t &offset) {
-  size_t start = offset;
-  while (offset < data.size() && data[offset] != std::byte(0)) {
-    ++offset;
-  }
-
-  if (offset >= data.size()) {
-    throw std::runtime_error(
-        "Invalid data: string not properly null-terminated.");
-  }
-
-  std::string result(reinterpret_cast<const char *>(&data[start]),
-                     offset - start);
-  ++offset; // Skip the null terminator
-  return result;
 }
 
 std::vector<std::byte> ResourceRequestMessage::serialize() const {
