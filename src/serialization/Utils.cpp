@@ -6,7 +6,7 @@
 std::vector<std::byte> serializeString(const std::string &str) {
   std::vector<std::byte> bytes(str.size());
   std::transform(str.begin(), str.end(), bytes.begin(),
-                 [](char c) { return static_cast<std::byte>(c); });
+                 [](char c) { return std::byte(c); });
   return bytes;
 }
 
