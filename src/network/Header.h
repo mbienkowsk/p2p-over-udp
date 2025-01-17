@@ -33,4 +33,7 @@ public:
   static bool validateHeaderSize(const std::vector<std::byte> &raw_data);
 
   bool operator==(const Header &rhs) const;
+
+  Header(std::byte ProtocolVersion, MsgType MessageType)
+      : ProtocolVersion(ProtocolVersion), MessageType(MessageType) {}
 };
