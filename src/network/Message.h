@@ -22,7 +22,7 @@ public:
 };
 
 /// Message broadcasted to announce available resources
-class ResourceAnnounceMessage : Message {
+class ResourceAnnounceMessage : public Message {
 public:
   /// Names of available resources
   std::vector<std::string> resourceNames;
@@ -33,10 +33,14 @@ public:
   /// Serializes the message into a vector of bytes in the format:
   /// header, resource names with null separators between the resource names
   std::vector<std::byte> serialize() const override;
+
+  /// Creates a message from a deserialized header and serialized payload
+  static ResourceAnnounceMessage
+  fromHeaderAndPayload(Header header, const std::vector<std::byte> &raw_data);
 };
 
 /// Message requesting a specific resource
-class ResourceRequestMessage : Message {
+class ResourceRequestMessage : public Message {
 public:
   /// Name of the requested resource
   std::string resource_name;
@@ -47,10 +51,14 @@ public:
   /// Serializes the message into a vector of bytes in the format:
   /// header, resource name as a contiguous sequence of bytes
   std::vector<std::byte> serialize() const override;
+
+  /// Creates a message from a deserialized header and serialized payload
+  static ResourceRequestMessage
+  fromHeaderAndPayload(Header header, const std::vector<std::byte> &raw_data);
 };
 
 /// Message containing a requested resource
-class ResourceDataMessage : Message {
+class ResourceDataMessage : public Message {
 public:
   /// Name of the resource
   std::string resourceName;
@@ -67,6 +75,10 @@ public:
   /// header, resource name, resource data with a null separator
   /// between the name and the data
   std::vector<std::byte> serialize() const override;
+
+  /// Creates a message from a deserialized header and serialized payload
+  static ResourceDataMessage
+  fromHeaderAndPayload(Header header, const std::vector<std::byte> &raw_data);
 };
 
 #endif

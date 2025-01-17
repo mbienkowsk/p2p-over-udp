@@ -9,6 +9,9 @@
 /// Represents the header of a message in our protocol
 class Header {
 public:
+  /// Size of the header in bytes
+  const static uint8_t SIZE = 2;
+
   enum class MsgType : uint8_t {
     RESOURCE_ANNOUCE = 0,
     RESOURCE_REQUEST = 1,
