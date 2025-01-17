@@ -1,3 +1,7 @@
+#ifndef HEADER_H
+#define HEADER_H
+#endif
+
 #include <cstddef>
 #include <cstdint>
 #include <vector>
@@ -22,6 +26,10 @@ public:
 
   /// Deserializes the header from a vector of 2 bytes
   static Header deserialize(const std::vector<std::byte> &raw_data);
+
+  static bool validateMessageType(uint8_t mt);
+
+  static bool validateHeaderSize(const std::vector<std::byte> &raw_data);
 
   bool operator==(const Header &rhs) const;
 };
