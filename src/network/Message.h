@@ -30,6 +30,11 @@ public:
   ResourceAnnounceMessage(Header header, std::vector<std::string> resourceNames)
       : Message(header), resourceNames(resourceNames) {};
 
+  /// Shorthand for creating the message with the default protocol
+  /// version for testing
+  ResourceAnnounceMessage(std::vector<std::string> resourceNames)
+      : Message(MessageType::RESOURCE_ANNOUCE), resourceNames(resourceNames) {};
+
   /// Serializes the message into a vector of bytes in the format:
   /// header, resource names with null separators between the resource names
   std::vector<std::byte> serialize() const override;
@@ -47,6 +52,11 @@ public:
 
   ResourceRequestMessage(Header header, const std::string &resource_name)
       : Message(header), resource_name(resource_name) {};
+
+  /// Shorthand for creating the message with the default protocol version
+  /// for testing
+  ResourceRequestMessage(const std::string &resource_name)
+      : Message(MessageType::RESOURCE_REQUEST), resource_name(resource_name) {};
 
   /// Serializes the message into a vector of bytes in the format:
   /// header, resource name as a contiguous sequence of bytes
@@ -69,6 +79,13 @@ public:
   ResourceDataMessage(Header header, const std::string &resource_name,
                       const std::vector<std::byte> &resource_data)
       : Message(header), resourceName(resource_name),
+        resourceData(resource_data) {};
+  ///
+  /// Shorthand for creating the message with the default protocol version
+  /// for testing
+  ResourceDataMessage(const std::string &resource_name,
+                      const std::vector<std::byte> &resource_data)
+      : Message(MessageType::RESOURCE_DATA), resourceName(resource_name),
         resourceData(resource_data) {};
 
   /// Serializes the message into a vector of bytes in the format:

@@ -22,14 +22,14 @@ Message *Message::from_bytes(const std::vector<std::byte> &raw_data) {
   payload.resize(raw_data.size() - Header::SIZE);
   std::memcpy(payload.data(), &raw_data[Header::SIZE], payload.size());
 
-  switch (header.MessageType) {
-  case Header::MsgType::RESOURCE_ANNOUCE:
+  switch (header.messageType) {
+  case MessageType::RESOURCE_ANNOUCE:
     return new ResourceAnnounceMessage(
         ResourceAnnounceMessage::fromHeaderAndPayload(header, payload));
-  case Header::MsgType::RESOURCE_REQUEST:
+  case MessageType::RESOURCE_REQUEST:
     return new ResourceRequestMessage(
         ResourceRequestMessage::fromHeaderAndPayload(header, payload));
-  case Header::MsgType::RESOURCE_DATA:
+  case MessageType::RESOURCE_DATA:
     return new ResourceDataMessage(
         ResourceDataMessage::fromHeaderAndPayload(header, payload));
   }

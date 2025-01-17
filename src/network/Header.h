@@ -6,24 +6,26 @@
 #include <cstdint>
 #include <vector>
 
+const uint8_t PROTOCOL_VERSION = 1;
+
+enum class MessageType : uint8_t {
+  RESOURCE_ANNOUCE = 0,
+  RESOURCE_REQUEST = 1,
+  RESOURCE_DATA = 2
+};
+
 /// Represents the header of a message in our protocol
 class Header {
 public:
   /// Size of the header in bytes
   const static uint8_t SIZE = 2;
 
-  enum class MsgType : uint8_t {
-    RESOURCE_ANNOUCE = 0,
-    RESOURCE_REQUEST = 1,
-    RESOURCE_DATA = 2
-  };
-
   /// Version of the protocol
-  std::uint8_t ProtocolVersion;
+  std::uint8_t protocolVersion;
 
   /// Type of the message (announce/request/data)
-  MsgType MessageType;
-  // uint32_t DataSize; TODO: do we need this?
+  MessageType messageType;
+  // uint32_t dataSize; TODO: do we need this?
 
   /// Serializes the header into a vector of bytes
   std::vector<std::byte> serialize() const;
@@ -37,6 +39,7 @@ public:
 
   bool operator==(const Header &rhs) const;
 
-  Header(MsgType MessageType, std::uint8_t ProtocolVersion = 1)
-      : ProtocolVersion(ProtocolVersion), MessageType(MessageType) {}
+  Header(MessageType MessageType,
+         std::uint8_t ProtocolVersion = PROTOCOL_VERSION)
+      : protocolVersion(ProtocolVersion), messageType(MessageType) {}
 };
