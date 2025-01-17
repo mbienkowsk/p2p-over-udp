@@ -33,9 +33,3 @@ public:
 
   bool operator==(const Header &rhs) const;
 };
-
-class Message {
-public:
-  Header header;
-  std::vector<uint8_t> data;
-};
