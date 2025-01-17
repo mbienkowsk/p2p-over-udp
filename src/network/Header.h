@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <vector>
 
+/// Represents the header of a message in our protocol
 class Header {
 public:
   enum class MsgType : uint8_t {
