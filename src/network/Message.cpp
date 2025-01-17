@@ -42,3 +42,7 @@ bool Message::operator==(const Message &rhs) const {
 
 Message::Message(const Header &header, std::vector<std::byte> data)
     : header(header), data(std::move(data)) {}
+
+const std::string Message::dataAsString() const {
+  return std::string(reinterpret_cast<const char *>(data.data()), data.size());
+}

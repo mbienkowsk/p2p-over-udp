@@ -46,12 +46,9 @@ TEST(MessageTest, DeserializeValidMessage) {
   EXPECT_EQ(message.header.MessageType, Header::MsgType::RESOURCE_DATA);
 
   // Expected payload
-  std::vector<std::byte> expected_payload = {std::byte{0x48}, std::byte{0x65},
-                                             std::byte{0x6C}, std::byte{0x6C},
-                                             std::byte{0x6F}};
 
   // Verify the payload matches the expected payload
-  EXPECT_EQ(message.data, expected_payload);
+  EXPECT_EQ(message.dataAsString(), std::string("Hello"));
 }
 
 // Test round-trip serialization/deserialization

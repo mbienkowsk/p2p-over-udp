@@ -3,6 +3,7 @@
 
 #include "Header.h"
 #include <cstddef>
+#include <string>
 #include <vector>
 
 /// Represents a message that can be sent over the network
@@ -24,6 +25,8 @@ public:
   bool operator==(const Message &rhs) const;
 
   Message(const Header &header, std::vector<std::byte> data);
+
+  const std::string dataAsString() const;
 };
 
 #endif
