@@ -1,5 +1,5 @@
 # Base stage: common setup for all tasks
-FROM ubuntu:20.04 AS base
+FROM ubuntu:22.04 AS base
 
 # Set non-interactive frontend for apt-get
 ENV DEBIAN_FRONTEND=noninteractive

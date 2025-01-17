@@ -5,7 +5,7 @@ default:
 
 # Build the project in debug mode
 build:
-  cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=./Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+  cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=./Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_STANDARD=20 ..
   make
 
 # Build and run the main executable
