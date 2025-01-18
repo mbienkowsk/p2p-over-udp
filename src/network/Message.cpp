@@ -1,10 +1,12 @@
 #include "Message.h"
 #include "../serialization/Utils.h"
 #include <cstring>
+#include <memory>
 #include <stdexcept>
 
 /// Deserializes a message from a vector of bytes
-Message *Message::from_bytes(const std::vector<std::byte> &raw_data) {
+std::unique_ptr<Message>
+Message::from_bytes(const std::vector<std::byte> &raw_data) {
   if (raw_data.size() < Header::SIZE) { // Minimum size for a valid header
     throw std::runtime_error("Invalid message: too short");
   }
@@ -20,14 +22,16 @@ Message *Message::from_bytes(const std::vector<std::byte> &raw_data) {
 
   switch (header.messageType) {
   case MessageType::RESOURCE_ANNOUCE:
-    return new ResourceAnnounceMessage(
+    return std::make_unique<ResourceAnnounceMessage>(
         ResourceAnnounceMessage::fromHeaderAndPayload(header, payload));
+
   case MessageType::RESOURCE_REQUEST:
-    return new ResourceRequestMessage(
-        ResourceRequestMessage::fromHeaderAndPayload(header, payload));
+    return std::make_unique<ResourceRequestMessage>(ResourceRequestMessage(
+        ResourceRequestMessage::fromHeaderAndPayload(header, payload)));
+
   case MessageType::RESOURCE_DATA:
-    return new ResourceDataMessage(
-        ResourceDataMessage::fromHeaderAndPayload(header, payload));
+    return std::make_unique<ResourceDataMessage>(ResourceDataMessage(
+        ResourceDataMessage::fromHeaderAndPayload(header, payload)));
   }
 }
 

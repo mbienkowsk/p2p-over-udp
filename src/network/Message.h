@@ -3,6 +3,7 @@
 
 #include "Header.h"
 #include <cstddef>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -16,7 +17,7 @@ public:
   virtual std::vector<std::byte> serialize() const = 0;
 
   /// Deserializes a message from a vector of bytes
-  Message *from_bytes(const std::vector<std::byte> &raw_data);
+  std::unique_ptr<Message> from_bytes(const std::vector<std::byte> &raw_data);
 
   Message(Header header) : header(header) {};
 
