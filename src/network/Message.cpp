@@ -4,10 +4,8 @@
 #include <stdexcept>
 
 /// Deserializes a message from a vector of bytes
-Message *Message::from_bytes(const std::vector<std::byte> &raw_data)
-{
-  if (raw_data.size() < Header::SIZE)
-  { // Minimum size for a valid header
+Message *Message::from_bytes(const std::vector<std::byte> &raw_data) {
+  if (raw_data.size() < Header::SIZE) { // Minimum size for a valid header
     throw std::runtime_error("Invalid message: too short");
   }
 
@@ -20,8 +18,7 @@ Message *Message::from_bytes(const std::vector<std::byte> &raw_data)
   payload.resize(raw_data.size() - Header::SIZE);
   std::memcpy(payload.data(), &raw_data[Header::SIZE], payload.size());
 
-  switch (header.messageType)
-  {
+  switch (header.messageType) {
   case MessageType::RESOURCE_ANNOUCE:
     return new ResourceAnnounceMessage(
         ResourceAnnounceMessage::fromHeaderAndPayload(header, payload));
@@ -36,16 +33,14 @@ Message *Message::from_bytes(const std::vector<std::byte> &raw_data)
   }
 }
 
-std::vector<std::byte> ResourceRequestMessage::serialize() const
-{
+std::vector<std::byte> ResourceRequestMessage::serialize() const {
   auto rv = header.serialize();
   auto rNameAsBytes = serializeString(resource_name);
   rv.insert(rv.end(), rNameAsBytes.begin(), rNameAsBytes.end());
   return rv;
 }
 
-std::vector<std::byte> ResourceDataMessage::serialize() const
-{
+std::vector<std::byte> ResourceDataMessage::serialize() const {
   auto rv = header.serialize();
   auto rNameAsBytes = serializeString(resourceName);
 
@@ -56,12 +51,10 @@ std::vector<std::byte> ResourceDataMessage::serialize() const
   return rv;
 }
 
-std::vector<std::byte> ResourceAnnounceMessage::serialize() const
-{
+std::vector<std::byte> ResourceAnnounceMessage::serialize() const {
   auto rv = header.serialize();
 
-  for (const auto &rName : resourceNames)
-  {
+  for (const auto &rName : resourceNames) {
     auto rNameAsBytes = serializeString(rName);
     rv.insert(rv.end(), rNameAsBytes.begin(), rNameAsBytes.end());
     rv.push_back(std::byte(0));
@@ -70,14 +63,12 @@ std::vector<std::byte> ResourceAnnounceMessage::serialize() const
 }
 
 ResourceAnnounceMessage ResourceAnnounceMessage::fromHeaderAndPayload(
-    Header header, const std::vector<std::byte> &raw_data)
-{
+    Header header, const std::vector<std::byte> &raw_data) {
   size_t offset = 0;
 
   // Deserialize resource names
   std::vector<std::string> resource_names;
-  while (offset < raw_data.size())
-  {
+  while (offset < raw_data.size()) {
     std::string resource_name = deserializeString(raw_data, offset);
     resource_names.push_back(resource_name);
   }
@@ -86,8 +77,7 @@ ResourceAnnounceMessage ResourceAnnounceMessage::fromHeaderAndPayload(
 }
 
 ResourceDataMessage ResourceDataMessage::fromHeaderAndPayload(
-    Header header, const std::vector<std::byte> &raw_data)
-{
+    Header header, const std::vector<std::byte> &raw_data) {
   size_t offset = 0;
 
   // Deserialize the resource name
@@ -101,8 +91,7 @@ ResourceDataMessage ResourceDataMessage::fromHeaderAndPayload(
 }
 
 ResourceRequestMessage ResourceRequestMessage::fromHeaderAndPayload(
-    Header header, const std::vector<std::byte> &raw_data)
-{
+    Header header, const std::vector<std::byte> &raw_data) {
   size_t offset = 0;
 
   // Deserialize the resource name
