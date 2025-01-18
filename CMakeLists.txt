@@ -6,9 +6,16 @@ project(PSI_projekt)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Set source directories
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/tests)
+
+add_library(network_lib ${SOURCE_DIR}/network/Header.cpp ${SOURCE_DIR}/network/Message.cpp ${SOURCE_DIR}/serialization/Utils.cpp)
+
 # Define sources and executable
-set(SOURCES src/main.cpp)
+set(SOURCES ${SOURCE_DIR}/main.cpp ${SOURCE_DIR}/network/Header.cpp ${SOURCE_DIR}/serialization/Utils.cpp)
 add_executable(${PROJECT_NAME} ${SOURCES})
+
 
 # Safety compilation flags 
 target_compile_options(${PROJECT_NAME} PRIVATE
@@ -54,6 +61,6 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 # Set unit test sources, add an executable for them and link them to gtest
-set(UNIT_TEST_SOURCES src/tests/ExampleTest.cpp)
+set(UNIT_TEST_SOURCES ${TEST_DIR}/HeaderTest.cpp ${TEST_DIR}/MessageTest.cpp)
 add_executable(all-unit-tests ${UNIT_TEST_SOURCES})
-target_link_libraries(all-unit-tests PUBLIC gtest_main)
+target_link_libraries(all-unit-tests PUBLIC gtest_main network_lib)
