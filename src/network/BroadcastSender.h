@@ -1,5 +1,5 @@
-#ifndef NETWORK_H
-#define NETWORK_H
+#ifndef BROADCAST_H
+#define BROADCAST_H
 #include <arpa/inet.h>
 #include <cstring>
 #include <functional>

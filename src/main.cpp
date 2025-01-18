@@ -4,7 +4,7 @@
 #include <iostream>
 #include <thread>
 
-#include "network/Network.h"
+#include "network/BroadcastSender.h"
 #include "resources/resource.h"
 #include "serialization/Utils.h"
 
