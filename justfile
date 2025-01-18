@@ -18,12 +18,11 @@ test: build
 
 # Format the code using clang-format
 format:
-  clang-format -i ../src/**/*.cpp  ../src/**/*.h
+  find ../src -iname '*.h' -o -iname '*.cpp' | xargs clang-format -i
 
 # Lint the code using clang-tidy
-lint: 
+lint:
   # Generate compile_commands.json
   cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
   cp compile_commands.json ..
   clang-tidy ../src/**/*.cpp  ../src/**/*.h
-
