@@ -13,11 +13,11 @@ set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/tests)
 add_library(network_lib ${SOURCE_DIR}/network/Header.cpp ${SOURCE_DIR}/network/Message.cpp ${SOURCE_DIR}/serialization/Utils.cpp)
 
 # Define sources and executable
-set(SOURCES ${SOURCE_DIR}/main.cpp ${SOURCE_DIR}/network/Header.cpp ${SOURCE_DIR}/serialization/Utils.cpp)
+set(SOURCES ${SOURCE_DIR}/main.cpp ${SOURCE_DIR}/network/Header.cpp ${SOURCE_DIR}/serialization/Utils.cpp ${SOURCE_DIR}/network/Message.cpp ${SOURCE_DIR}/network/Network.cpp)
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 
-# Safety compilation flags 
+# Safety compilation flags
 target_compile_options(${PROJECT_NAME} PRIVATE
     -Wall
     -Wextra
@@ -44,9 +44,9 @@ endif()
 
 # Link spdlog
 find_package(spdlog REQUIRED)
-if(spdlog_FOUND) 
+if(spdlog_FOUND)
     target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog $<$<BOOL:${MINGW}>:ws2_32>)
-else() 
+else()
     message(FATAL_ERROR "Spdlog not found")
 endif()
 
