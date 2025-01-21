@@ -14,6 +14,7 @@ add_library(network_lib
     ${SOURCE_DIR}/network/Header.cpp
     ${SOURCE_DIR}/network/Message.cpp
     ${SOURCE_DIR}/network/Listener.cpp
+    ${SOURCE_DIR}/network/UdpSender.cpp
     ${SOURCE_DIR}/serialization/Utils.cpp
 )
 
@@ -31,6 +32,8 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 add_executable(UDP_LISTENER ${SOURCE_DIR}/network/ListenerMain.cpp)
 target_link_libraries(UDP_LISTENER network_lib)
 
+add_executable(UDP_SENDER ${SOURCE_DIR}/network/SenderMain.cpp)
+target_link_libraries(UDP_SENDER network_lib)
 
 # Safety compilation flags
 target_compile_options(${PROJECT_NAME} PRIVATE
