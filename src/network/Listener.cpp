@@ -50,7 +50,7 @@ void UdpListener::listen() {
     return;
   }
 
-  char buffer[1024];
+  char buffer[MAX_MSG_SIZE];
   sockaddr_in clientAddr{};
   socklen_t clientAddrLen = sizeof(clientAddr);
 
