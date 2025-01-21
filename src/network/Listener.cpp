@@ -80,7 +80,7 @@ void UdpListener::listen() {
       // Handle message type
       if (auto *resourceAnnounce =
               dynamic_cast<ResourceAnnounceMessage *>(message.get())) {
-        std::cout << resourceAnnounce << std::endl;
+        std::cout << *resourceAnnounce << std::endl;
       } else if (auto *resourceRequest =
                      dynamic_cast<ResourceRequestMessage *>(message.get())) {
         std::cout << *resourceRequest << std::endl;
