@@ -12,6 +12,9 @@ build:
 run: build
   ./Debug/PSI_projekt
 
+run_listener: build
+  ./Debug/UDP_LISTENER
+
 # Build and run unit tests
 test: build
   ./Debug/all-unit-tests

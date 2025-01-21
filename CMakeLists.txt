@@ -10,11 +10,25 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/tests)
 
-add_library(network_lib ${SOURCE_DIR}/network/Header.cpp ${SOURCE_DIR}/network/Message.cpp ${SOURCE_DIR}/serialization/Utils.cpp)
+add_library(network_lib
+    ${SOURCE_DIR}/network/Header.cpp
+    ${SOURCE_DIR}/network/Message.cpp
+    ${SOURCE_DIR}/network/Listener.cpp
+    ${SOURCE_DIR}/serialization/Utils.cpp
+)
 
 # Define sources and executable
-set(SOURCES ${SOURCE_DIR}/main.cpp ${SOURCE_DIR}/network/Header.cpp ${SOURCE_DIR}/serialization/Utils.cpp ${SOURCE_DIR}/network/Message.cpp ${SOURCE_DIR}/network/BroadcastSender.cpp ${SOURCE_DIR}/network/UdpSender.cpp)
+set(SOURCES
+    ${SOURCE_DIR}/main.cpp
+    ${SOURCE_DIR}/network/Header.cpp
+    ${SOURCE_DIR}/serialization/Utils.cpp
+    ${SOURCE_DIR}/network/Message.cpp
+    ${SOURCE_DIR}/network/BroadcastSender.cpp
+)
 add_executable(${PROJECT_NAME} ${SOURCES})
+
+add_executable(UDP_LISTENER ${SOURCE_DIR}/network/ListenerMain.cpp)
+target_link_libraries(UDP_LISTENER network_lib)
 
 
 # Safety compilation flags
