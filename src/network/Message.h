@@ -108,4 +108,8 @@ public:
   bool operator==(const ResourceDataMessage &) const = default;
 };
 
+std::ostream &operator<<(std::ostream &os, const ResourceAnnounceMessage &msg);
+std::ostream &operator<<(std::ostream &os, const ResourceRequestMessage &msg);
+std::ostream &operator<<(std::ostream &os, const ResourceDataMessage &msg);
+
 #endif

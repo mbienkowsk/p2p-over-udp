@@ -105,3 +105,25 @@ ResourceRequestMessage ResourceRequestMessage::fromHeaderAndPayload(
 
   return ResourceRequestMessage(header, resource_name);
 }
+
+// Overload the ostream operator for ResourceAnnounceMessage
+std::ostream &operator<<(std::ostream &os, const ResourceAnnounceMessage &msg) {
+  os << "ResourceAnnounceMessage\nRequested resources:";
+  for (const auto &resource : msg.resourceNames) {
+    os << "\n* " << resource;
+  }
+  return os;
+}
+
+// Overload the ostream operator for ResourceRequestMessage
+std::ostream &operator<<(std::ostream &os, const ResourceRequestMessage &msg) {
+  os << "ResourceRequestMessage\nRequested resource: " << msg.resource_name;
+  return os;
+}
+
+// Overload the ostream operator for ResourceDataMessage
+std::ostream &operator<<(std::ostream &os, const ResourceDataMessage &msg) {
+  os << "ResourceDataMessage\nResource name: " << msg.resourceName;
+  os << "\nContains binary data (" << msg.resourceData.size() << " bytes).";
+  return os;
+}
