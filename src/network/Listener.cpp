@@ -20,7 +20,7 @@ UdpListener::~UdpListener() {
 void UdpListener::start() {
   tryCreateSocket();
   tryBindSocket();
-  // spdlog::info("Listening on port {} for incoming UDP traffic...\n", port);
+  spdlog::info("Listening on port {} for incoming UDP traffic...\n", port);
 }
 
 void UdpListener::listen() {
@@ -99,10 +99,10 @@ ssize_t UdpListener::tryRecv(char *buffer) {
   inet_ntop(AF_INET, &clientAddr.sin_addr, clientIp, INET_ADDRSTRLEN);
 
   if (received >= 0) {
-    // spdlog::info("Message received from {}:{}", clientIp,
-    // ntohs(clientAddr.sin_port));
+    spdlog::info("Message received from {}:{}", clientIp,
+                 ntohs(clientAddr.sin_port));
   } else {
-    // spdlog::error("Failed to receive data");
+    spdlog::error("Failed to receive data");
   }
   return received;
 }
