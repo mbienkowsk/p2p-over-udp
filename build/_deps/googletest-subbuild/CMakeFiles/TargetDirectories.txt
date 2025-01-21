@@ -1,3 +1,0 @@
-/home/adrwal/studia/psi/psi-projekt/build/_deps/googletest-subbuild/CMakeFiles/googletest-populate.dir
-/home/adrwal/studia/psi/psi-projekt/build/_deps/googletest-subbuild/CMakeFiles/edit_cache.dir
-/home/adrwal/studia/psi/psi-projekt/build/_deps/googletest-subbuild/CMakeFiles/rebuild_cache.dir

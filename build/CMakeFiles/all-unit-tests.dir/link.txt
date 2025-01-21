@@ -1,1 +1,0 @@
-/usr/bin/g++ -g "CMakeFiles/all-unit-tests.dir/src/tests/HeaderTest.cpp.o" "CMakeFiles/all-unit-tests.dir/src/tests/MessageTest.cpp.o" -o all-unit-tests  lib/libgtest_main.a libnetwork_lib.a lib/libgtest.a 
