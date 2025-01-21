@@ -91,7 +91,7 @@ ssize_t UdpListener::tryRecv(char *buffer) {
   sockaddr_in clientAddr{};
   socklen_t clientAddrLen = sizeof(clientAddr);
 
-  ssize_t received = recvfrom(sockfd, buffer, sizeof(buffer), 0,
+  ssize_t received = recvfrom(sockfd, buffer, MAX_MSG_SIZE, 0,
                               (struct sockaddr *)&clientAddr, &clientAddrLen);
 
   // Print the sender's address
@@ -99,7 +99,7 @@ ssize_t UdpListener::tryRecv(char *buffer) {
   inet_ntop(AF_INET, &clientAddr.sin_addr, clientIp, INET_ADDRSTRLEN);
 
   if (received >= 0) {
-    spdlog::info("Message received from {}:{}", clientIp,
+    spdlog::info("Received {} bytes from {}:{}", received, clientIp,
                  ntohs(clientAddr.sin_port));
   } else {
     spdlog::error("Failed to receive data");
