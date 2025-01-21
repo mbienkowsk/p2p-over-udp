@@ -24,6 +24,7 @@ set(SOURCES
     ${SOURCE_DIR}/serialization/Utils.cpp
     ${SOURCE_DIR}/network/Message.cpp
     ${SOURCE_DIR}/network/BroadcastSender.cpp
+    ${SOURCE_DIR}/network/UdpSender.cpp
 )
 add_executable(${PROJECT_NAME} ${SOURCES})
 
