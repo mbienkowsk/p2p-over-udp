@@ -32,8 +32,8 @@ Message::from_bytes(const std::vector<std::byte> &raw_data) {
   case MessageType::RESOURCE_DATA:
     return std::make_unique<ResourceDataMessage>(ResourceDataMessage(
         ResourceDataMessage::fromHeaderAndPayload(header, payload)));
-    return new ResourceDataMessage(
-        ResourceDataMessage::fromHeaderAndPayload(header, payload));
+    return std::make_unique<ResourceDataMessage>(ResourceDataMessage(
+        ResourceDataMessage::fromHeaderAndPayload(header, payload)));
   default:
     throw std::runtime_error("Invalid message type");
   }
