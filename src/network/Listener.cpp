@@ -67,16 +67,29 @@ void UdpListener::listen() {
     std::vector<std::byte> rawData(received);
     std::memcpy(rawData.data(), buffer, received);
 
-    // Attempt to parse the message
     try {
       std::unique_ptr<Message> message = Message::from_bytes(rawData);
 
       // Print the sender's address
       char clientIp[INET_ADDRSTRLEN];
       inet_ntop(AF_INET, &clientAddr.sin_addr, clientIp, INET_ADDRSTRLEN);
+
       std::cout << "Message received from " << clientIp << ":"
-                << ntohs(clientAddr.sin_port) << " - Parsed successfully"
-                << std::endl;
+                << ntohs(clientAddr.sin_port) << std::endl;
+
+      // Handle message type
+      if (auto *resourceAnnounce =
+              dynamic_cast<ResourceAnnounceMessage *>(message.get())) {
+        std::cout << resourceAnnounce << std::endl;
+      } else if (auto *resourceRequest =
+                     dynamic_cast<ResourceRequestMessage *>(message.get())) {
+        std::cout << *resourceRequest << std::endl;
+      } else if (auto *resourceData =
+                     dynamic_cast<ResourceDataMessage *>(message.get())) {
+        std::cout << *resourceData << std::endl;
+      } else {
+        std::cout << "Unknown Message Type" << std::endl;
+      }
 
     } catch (const std::exception &ex) {
       std::cerr << "Failed to parse message: " << ex.what() << std::endl;
