@@ -9,6 +9,7 @@
 #include "resources/resource.h"
 #include "serialization/Utils.h"
 #include "log/log.h"
+#include "network/UdpSender.h"
 
 #define PORT 12345
 #define BROADCAST_ADDR "172.21.255.255"
