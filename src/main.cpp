@@ -21,5 +21,11 @@ int main()
     return ResourceAnnounceMessage({"resource1", "resource2"}); });
 
   broadcast_thread.join();
+
+  UdpSender sender(
+      "0.0.0.0", 12345);
+
+  sender.sendMessage(ResourceAnnounceMessage({"resource1", "resource2"}));
+
   spdlog::info("Exiting main");
 }
