@@ -74,15 +74,9 @@ void handleListResources() {
 }
 
 void handleFind(const std::string &filename) {
-    UdpSender sender(BROADCAST_ADDR, DISCOVERY_PORT);
-
-    ResourceRequestMessage request(filename);
-
-    sender.sendMessage(requestMsg);
-
     std::cout << "Broadcasted request for file: '" << filename << "'\n";
 
-    
+
 }
 
 void handleDownload(const std::string &hostIp, const std::string &filename) {
