@@ -122,3 +122,5 @@ UdpListener::ReceivedPacket UdpListener::tryRecv(char *buffer) {
   receivedPacket.senderPort = ntohs(clientAddr.sin_port);
   return receivedPacket;
 }
+
+SMap UdpListener::runningDownloads;
