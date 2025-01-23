@@ -1,8 +1,8 @@
 #include "BroadcastSender.h"
+#include "ThreadSafeHashMap.h"
 #include "spdlog/spdlog.h"
 #include <arpa/inet.h>
 #include <cstring>
-#include <iostream>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -25,9 +25,10 @@ BroadcastSender::BroadcastSender(int port,
 };
 
 std::thread
-BroadcastSender::make_worker(std::function<ResourceAnnounceMessage()> msg_gen) {
-    return std::thread([this, msg_gen]() {
-        while (true) {
+BroadcastSender::make_worker(SABool stop,
+                             std::function<ResourceAnnounceMessage()> msg_gen) {
+    return std::thread([this, stop, msg_gen]() {
+        while (!stop) {
             ResourceAnnounceMessage msg = msg_gen();
             broadcast(sock_, *broadcast_addr_, msg);
             std::this_thread::sleep_for(std::chrono::seconds(3));

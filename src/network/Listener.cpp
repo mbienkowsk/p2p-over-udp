@@ -2,11 +2,14 @@
 #include "Downloader.h"
 #include "UdpSender.h"
 #include <arpa/inet.h>
+#include <asm-generic/socket.h>
 #include <cstring>
+#include <fmt/ranges.h>
 #include <iostream>
 #include <memory>
 #include <spdlog/spdlog.h>
 #include <stdexcept>
+#include <sys/socket.h>
 #include <unistd.h>
 #include <vector>
 
@@ -25,15 +28,16 @@ UdpListener::~UdpListener() {
 void UdpListener::start() {
     tryCreateSocket();
     tryBindSocket();
+    setSockOptions();
     spdlog::info("Listening on port {} for incoming UDP traffic...\n", port);
 }
 
-void UdpListener::listen() {
+void UdpListener::listen(SABool stop) {
     checkSockInit();
 
     char buffer[MAX_MSG_SIZE];
 
-    while (true) {
+    while (!*stop) {
         auto receivedPacket = tryRecv(buffer);
         if (receivedPacket.nBytes < 0) {
             // already logged it
@@ -52,8 +56,8 @@ void UdpListener::listen() {
         }
     }
 }
-std::thread UdpListener::detached_listen() {
-    return std::thread(&UdpListener::listen, this);
+std::thread UdpListener::detached_listen(SABool stop) {
+    return std::thread(&UdpListener::listen, this, stop);
 }
 
 void UdpListener::handleMessage(std::unique_ptr<Message> message,
@@ -67,6 +71,7 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
         // Log
         spdlog::info("Updated resources for {}: {}", senderIp,
                      fmt::join(resourceAnnounce->resourceNames, ", "));
+
     } else if (auto *resourceRequest =
                    dynamic_cast<ResourceRequestMessage *>(message.get())) {
         std::cout << *resourceRequest << std::endl;
@@ -149,3 +154,10 @@ UdpListener::ReceivedPacket UdpListener::tryRecv(char *buffer) {
 }
 
 SMap UdpListener::runningDownloads;
+
+void UdpListener::setSockOptions() {
+    if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &UdpListener::TIMEOUT,
+                   sizeof(UdpListener::TIMEOUT)) < 0) {
+        throw std::runtime_error("Failed to set socket options");
+    }
+}

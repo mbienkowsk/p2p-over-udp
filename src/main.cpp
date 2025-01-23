@@ -2,6 +2,7 @@
 #include "network/ThreadSafeHashMap.h"
 #include "serialization/Utils.h"
 #include "spdlog/spdlog.h"
+#include <atomic>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/post.hpp>
 #include <iostream>
@@ -10,9 +11,6 @@
 #include "cli/Cli.h"
 #include "log/Log.h"
 #include "network/BroadcastSender.h"
-#include "network/Downloader.h"
-#include "network/UdpSender.h"
-#include "resources/resource.h"
 #include "serialization/Utils.h"
 #include <memory>
 #include <unistd.h>
@@ -48,19 +46,32 @@ int main(int argc, char *argv[]) {
     auto listener =
         UdpListener(LISTENER_PORT, localResourceManager, peerResourceMap);
 
-    auto broadcast_thread = b.make_worker([localResourceManager]() {
-        return ResourceAnnounceMessage(localResourceManager->listResources());
-    });
+    auto broadcastStop = std::make_shared<std::atomic_bool>(false);
+    auto broadcastThread =
+        b.make_worker(broadcastStop, [broadcastStop, localResourceManager]() {
+            return ResourceAnnounceMessage(
+                localResourceManager->listResources());
+        });
 
     CLI cli(localResourceManager, peerResourceMap);
 
     listener.start();
-    auto listener_thread = listener.detached_listen();
+    auto listenerStop = std::make_shared<std::atomic_bool>(false);
+    auto listenerThread = listener.detached_listen(listenerStop);
 
     cli.run();
 
-    broadcast_thread.join();
-    listener_thread.join();
+    spdlog::info("Waiting for subthreads to finish.");
+
+    if (listenerThread.joinable()) {
+        listenerStop->store(true);
+        listenerThread.join();
+    }
+
+    if (broadcastThread.joinable()) {
+        broadcastStop->store(true);
+        broadcastThread.join();
+    }
 
     spdlog::info("Exiting main");
     return 0;
