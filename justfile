@@ -8,9 +8,9 @@ build:
   cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=./Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_STANDARD=20 ..
   make
 
-# Build and run the main executable
-run: build
-  ./Debug/PSI_projekt
+# Build and run the main executable listening on the given port, logging to the given file
+run port logfile: build
+  ./Debug/PSI_projekt {{port}} {{logfile}}
 
 run_listener: build
   ./Debug/UDP_LISTENER

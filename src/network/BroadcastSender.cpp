@@ -1,8 +1,8 @@
 #include "BroadcastSender.h"
+#include "ThreadSafeHashMap.h"
 #include "spdlog/spdlog.h"
 #include <arpa/inet.h>
 #include <cstring>
-#include <iostream>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -24,11 +24,12 @@ BroadcastSender::BroadcastSender(int port,
     this->sock_ = sock;
 };
 
-std::thread
-BroadcastSender::make_worker(std::function<ResourceAnnounceMessage()> msg_gen) {
-    return std::thread([this, msg_gen]() {
-        while (true) {
-            ResourceAnnounceMessage msg = msg_gen();
+std::thread BroadcastSender::make_worker(SABool stop,
+                                         SRManager resourceManager) {
+    return std::thread([this, stop, resourceManager]() {
+        while (!stop) {
+            auto msg =
+                ResourceAnnounceMessage(resourceManager->listResources());
             broadcast(sock_, *broadcast_addr_, msg);
             std::this_thread::sleep_for(std::chrono::seconds(3));
         }
@@ -51,9 +52,9 @@ void setup_broadcast_socket(int &sock) {
 
 void broadcast(int sock, struct sockaddr_in &broadcast_addr,
                const ResourceAnnounceMessage &msg) {
-    spdlog::info(
-        "Broadcasting message of type RESOURCE_ANNOUNCE with {} resources",
-        msg.resourceNames.size());
+    spdlog::info("Broadcasting message of type RESOURCE_ANNOUNCE "
+                 "with {} resources",
+                 msg.resourceNames.size());
 
     auto bytes = msg.serialize();
     if (sendto(sock, bytes.data(), bytes.size(), 0,

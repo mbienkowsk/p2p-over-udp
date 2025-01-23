@@ -21,12 +21,15 @@ class UdpListener {
     ~UdpListener();
 
     void start();
-    void listen();
-    std::thread detached_listen();
+    void listen(SABool stop);
+    void setSockOptions();
+    std::thread detached_listen(SABool stop);
 
     static SMap runningDownloads;
 
   private:
+    constexpr static const timeval TIMEOUT = {1, 0};
+
     struct ReceivedPacket {
         ssize_t nBytes;
         std::string senderIp;
