@@ -12,15 +12,6 @@ build:
 run port logfile: build
   ./Debug/PSI_projekt {{port}} {{logfile}}
 
-run_listener: build
-  ./Debug/UDP_LISTENER
-
-run_sender: build
-  ./Debug/UDP_SENDER
-
-run_manager: build
-  ./Debug/RESOURCE_MANAGER
-
 # Build and run unit tests
 test: build
   ./Debug/all-unit-tests

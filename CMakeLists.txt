@@ -42,18 +42,6 @@ set(SOURCES
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-add_executable(UDP_LISTENER ${SOURCE_DIR}/network/ListenerMain.cpp)
-target_link_libraries(UDP_LISTENER network_lib spdlog::spdlog)
-
-# add_executable(UDP_SENDER ${SOURCE_DIR}/network/SenderMain.cpp)
-# target_link_libraries(UDP_SENDER network_lib)
-
-# add_executable(RESOURCE_MANAGER ${SOURCE_DIR}/resources/ResourceManagerMain.cpp)
-# target_link_libraries(RESOURCE_MANAGER network_lib spdlog::spdlog)
-
-# add_executable(CLI ${SOURCE_DIR}/cli/CliMain.cpp)
-# target_link_libraries(CLI network_lib spdlog::spdlog)
-
 
 # Safety compilation flags
 target_compile_options(${PROJECT_NAME} PRIVATE

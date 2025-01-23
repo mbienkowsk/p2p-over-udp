@@ -1,10 +1,7 @@
 #include "../resources/LocalResourceManager.h"
 #include "../resources/PeerResourceMap.h"
 #include "Cli.h"
-#include <iostream>
-#include <map>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 int main() {
