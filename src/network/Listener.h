@@ -2,7 +2,6 @@
 #define UDP_LISTENER_H
 
 #include "Message.h"
-// #include "Worker.h"
 #include <memory>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -21,7 +20,6 @@ private:
     std::string senderIp;
     uint16_t senderPort;
   };
-  // ResourceWorkersManager workersManager = ResourceWorkersManager();
 
   static const int MAX_MSG_SIZE = 65505;
   int port;

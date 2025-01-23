@@ -1,4 +1,5 @@
 #include "Listener.h"
+#include "Downloader.h"
 #include "UdpSender.h"
 #include <arpa/inet.h>
 #include <cstring>
@@ -67,6 +68,15 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
                  dynamic_cast<ResourceDataMessage *>(message.get())) {
     std::cout << *resourceData << std::endl;
     // TODO: save the resource to disk
+    auto downloader =
+        Downloader::getRunningDownload(resourceData->resourceName);
+    if (!downloader) {
+      spdlog::warn("Received not requested resource. Dropping it...: {}",
+                   resourceData->resourceName);
+      return;
+    }
+    downloader->stop();
+    std::cout << "listener after stop" << std::endl;
   } else {
     std::cout << "Unknown Message Type" << std::endl;
   }
