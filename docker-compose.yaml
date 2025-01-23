@@ -8,8 +8,8 @@ services:
       - "8000/udp" # Makes 8000/udp visible to other containers on the same network
     networks:
       - p2p-net
-    # command: just run 8000 log1.log
-    command: sh
+    # TODO: remove hardcoded port
+    command: just run 8000 log1.log
   client2:
     build:
       context: .
@@ -19,8 +19,8 @@ services:
       - "8000/udp"
     networks:
       - p2p-net
-    # command: just run 8000 log2.log
-    command: sh
+    # TODO: remove hardcoded port
+    command: just run 8000 log2.log
 networks:
   p2p-net:
     driver: bridge

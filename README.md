@@ -26,6 +26,8 @@ just lint
 
 ### Docker
 
+## Dockerfile
+
 zbudowanie kontenera
 
 ```bash
@@ -50,6 +52,22 @@ docker run --rm -v ./:/app/ -it psi-projekt:latest [ run/build/lint/test ]
 # Przykład. Uruchomienie `just format` w kontenerze, sformatuje kod na lokalnej maszynie. Bez konieczności instalowania narzędzi.
 docker run --rm -v ./:/app/ -it psi-projekt:latest format
 ```
+
+## Compose
+
+zawiera 2 targety do 2 klientów. Przydatne jest uruchomienie shella, żeby pogrzebać w cwd żeby zawartość host_resources się różniła:
+
+```bash
+docker compose run --rm --service-ports --build clientX sh
+```
+
+Uruchomienie kontenera:
+
+```bash
+docker compose up --rm --service-ports --build clientX
+```
+
+Uruchamiamy na oddzielnych terminalach, powinny się widzeć i współpracować.
 
 ### Biblioteki do dociągnięcia do pracy lokalnej
 
