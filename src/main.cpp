@@ -17,7 +17,7 @@
 #include <memory>
 #include <unistd.h>
 
-#define PORT 12345
+#define PORT 8000
 #define BROADCAST_ADDR "172.21.255.255"
 #define RESOURCE_FOLDER "../host_resources"
 
@@ -33,10 +33,8 @@ int main(int argc, char *argv[]) {
     if (argc > 2) {
         setup_logger(true, argv[2]);
     } else {
-        setup_logger(false);
+        setup_logger(false, "");
     }
-
-    setup_logger(true);
 
     auto b = BroadcastSender(PORT, BROADCAST_ADDR);
 

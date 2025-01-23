@@ -63,11 +63,10 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     -pedantic
     -pedantic-errors
 )
-target_link_options(${PROJECT_NAME} PRIVATE
-    -fsanitize=address
-    -fsanitize=undefined
-    -fsanitize=leak
-)
+# target_link_options(${PROJECT_NAME} PRIVATE
+#     -fsanitize=undefined
+#     -fsanitize=leak
+# )
 
 # Link boost
 find_package(Boost 1.71.0 COMPONENTS filesystem system REQUIRED)

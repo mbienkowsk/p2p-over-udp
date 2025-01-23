@@ -122,7 +122,9 @@ void CLI::handleDownload(const std::string &hostIp,
     {
         auto downloader = Downloader::create(sender, msg);
         auto res = downloader->start();
-        std::cout << "Downloader started: " << res << std::endl;
+        if (res)
+            std::cout << "Downloading '" << filename << "' from " << hostIp
+                      << "\n";
     }
 }
 
