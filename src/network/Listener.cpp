@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <vector>
 
-UdpListener::UdpListener(int port) : port(port), sockfd(-1) {}
+UdpListener::UdpListener(int port) : port(port), sockfd(-1), resourceManager("../host_resources") {}
 
 UdpListener::~UdpListener() {
   if (sockfd >= 0) {
@@ -67,7 +67,10 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
   } else if (auto *resourceData =
                  dynamic_cast<ResourceDataMessage *>(message.get())) {
     std::cout << *resourceData << std::endl;
-    // TODO: save the resource to disk
+    std::string rName = resourceData->resourceName;
+    std::vector<std::byte> rData = resourceData->resourceData;
+
+    resourceManager.saveResource(rName, std::string(reinterpret_cast<const char*>(rData.data()), rData.size()));
   } else {
     std::cout << "Unknown Message Type" << std::endl;
   }

@@ -14,9 +14,10 @@ class ResourceManager {
         std::string folder_;
     public:
         ResourceManager(const std::string& folderPath);
-        void removeResource(const std::string& resourceName);
         std::vector<std::string> listResources() const;
         bool resourceExists(const std::string& resourceName) const;
+        void saveResource(const std::string& resourceName, const std::string& content);
+        void removeResource(const std::string& resourceName);
         void setResourceFolder(const std::string& newFolderPath);
         std::string getResourceFolder() const;
 };

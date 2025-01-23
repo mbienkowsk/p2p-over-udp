@@ -16,23 +16,6 @@ ResourceManager::ResourceManager(const std::string& folderPath)
     }
 }
 
-// Removing resource
-void ResourceManager::removeResource(const std::string& resourceName) {
-    std::string filePath = folder_ + "/" + resourceName;
-
-    // Check if the resource exists
-    if (!std::filesystem::exists(filePath)) {
-        spdlog::warn("Cant delete {}, resource not found", resourceName);
-        return;
-    }
-
-    // Delete file
-    if (std::filesystem::remove(filePath)) {
-        spdlog::info("Deleted {}", resourceName);
-    } else {
-        spdlog::error("Couldnt delete {}", resourceName);
-    }
-}
 
 // Listing all resources
 std::vector<std::string> ResourceManager::listResources() const {
@@ -52,6 +35,44 @@ std::vector<std::string> ResourceManager::listResources() const {
 bool ResourceManager::resourceExists(const std::string& resourceName) const {
     std::string filePath = folder_ + "/" + resourceName;
     return std::filesystem::exists(filePath);
+}
+
+void ResourceManager::saveResource(const std::string& resourceName, const std::string& content) {
+    std::string filePath = folder_ + "/" + resourceName;
+
+    // Check if it already exists
+    if (std::filesystem::exists(filePath)) {
+        spdlog::warn("Resource {} already saved", resourceName);
+        return;
+    }
+
+    // Saving resource as file
+    std::ofstream outFile(filePath);
+    if (outFile.is_open()) {
+        outFile << content;
+        outFile.close();
+        spdlog::info("Resource {} has been saved", resourceName);
+    } else {
+        spdlog::error("Couldnt save {}", resourceName);
+    }
+}
+
+// Removing resource
+void ResourceManager::removeResource(const std::string& resourceName) {
+    std::string filePath = folder_ + "/" + resourceName;
+
+    // Check if the resource exists
+    if (!std::filesystem::exists(filePath)) {
+        spdlog::warn("Cant delete {}, resource not found", resourceName);
+        return;
+    }
+
+    // Delete file
+    if (std::filesystem::remove(filePath)) {
+        spdlog::info("Deleted {}", resourceName);
+    } else {
+        spdlog::error("Couldnt delete {}", resourceName);
+    }
 }
 
 // Set a new resource folder

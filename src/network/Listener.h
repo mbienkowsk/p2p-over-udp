@@ -4,6 +4,7 @@
 #include "Message.h"
 #include "ThreadSafeHashMap.h"
 #include "../resources/ResourceMap.h"
+#include "../resources/ResourceManager.h"
 #include <memory>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -30,6 +31,7 @@ private:
   int port;
   int sockfd;
   ResourceMap resourceMap;
+  ResourceManager resourceManager;
   void handleMessage(std::unique_ptr<Message> message,
                      const std::string &senderIp, const uint16_t &senderPort);
   void checkSockInit() const;

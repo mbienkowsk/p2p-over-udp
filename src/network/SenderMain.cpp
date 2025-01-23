@@ -22,9 +22,9 @@ int main() {
     std::cout << "Sent: " << requestMessage << std::endl;
 
     // Create and send ResourceDataMessage
-    std::vector<std::byte> data = {std::byte{0xDE}, std::byte{0xAD},
-                                   std::byte{0xBE}, std::byte{0xEF}};
-    ResourceDataMessage dataMessage("Resource1", data);
+    std::vector<std::byte> data = {std::byte{0x60}, std::byte{0x65},
+                                   std::byte{0x67}, std::byte{0x69}};
+    ResourceDataMessage dataMessage("Resource2", data);
     sender.sendMessage(dataMessage);
     std::cout << "Sent: " << dataMessage << std::endl;
   } catch (const std::exception &e) {
