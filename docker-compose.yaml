@@ -5,25 +5,25 @@ services:
     build: .
     container_name: node1
     networks:
-      p2p_network:
-        ipv4_address: 172.22.0.2
+      - p2p_network
     tty: true
     stdin_open: true
-    command: /bin/bash
+    entrypoint: /bin/bash
+    expose:
+      - "8000/udp" 
 
   node2:
     build: .
     container_name: node2
     networks:
-      p2p_network:
-        ipv4_address: 172.22.0.3
+      - p2p_network
     tty: true
     stdin_open: true
-    command: /bin/bash
+    entrypoint: /bin/bash
+    expose:
+      - "8000/udp"
+
 
 networks:
   p2p_network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.22.0.0/24

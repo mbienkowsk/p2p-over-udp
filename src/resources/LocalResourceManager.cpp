@@ -70,7 +70,8 @@ LocalResourceManager::getResource(const std::string &resourceName) {
 
     std::ifstream file(filePath, std::ios::binary | std::ios::ate);
     if (!file) {
-        std::cerr << "Cannot open resource" << resourceName << '\n';
+        std::cerr << "Cannot open resource " << resourceName << " at "
+                  << filePath << '\n';
         return {};
     }
 
