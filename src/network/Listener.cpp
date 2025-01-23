@@ -54,6 +54,7 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
           dynamic_cast<ResourceAnnounceMessage *>(message.get())) {
     std::cout << *resourceAnnounce << std::endl;
     // TODO: updated the list of available resources
+    resourceMap.updateResources(senderIp, resourceAnnounce->resourceNames);
   } else if (auto *resourceRequest =
                  dynamic_cast<ResourceRequestMessage *>(message.get())) {
     std::cout << *resourceRequest << std::endl;

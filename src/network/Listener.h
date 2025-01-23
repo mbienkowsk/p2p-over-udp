@@ -3,6 +3,7 @@
 
 #include "Message.h"
 #include "ThreadSafeHashMap.h"
+#include "../resources/ResourceMap.h"
 #include <memory>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -28,6 +29,7 @@ private:
   static const int MAX_MSG_SIZE = 65505;
   int port;
   int sockfd;
+  ResourceMap resourceMap;
   void handleMessage(std::unique_ptr<Message> message,
                      const std::string &senderIp, const uint16_t &senderPort);
   void checkSockInit() const;

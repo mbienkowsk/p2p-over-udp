@@ -20,6 +20,20 @@ std::vector<std::string> ResourceMap::getPeerResources(const std::string& peerIP
     return {};
 }
 
+std::vector<std::string> ResourceMap::getResourceHosts(const std::string& searchedResource){
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::vector<std::string> resourceHosts;
+    for (const auto& entry : resourceMap_){
+        const auto& resources = entry.second;
+
+        if (std::find(resources.begin(), resources.end(), searchedResource) != resources.end()){
+            resourceHosts.push_back(entry.first);
+        }
+    }
+
+    return resourceHosts;
+}
+
 std::map<std::string, std::vector<std::string>> ResourceMap::getAllResources() {
     std::lock_guard<std::mutex> lock(mutex_);
     return resourceMap_;

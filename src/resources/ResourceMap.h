@@ -11,8 +11,9 @@ class ResourceMap{
     public:
         void updateResources(const std::string& senderIP, const std::vector<std::string>& resources);
         std::vector<std::string> getPeerResources(const std::string& peerIP);
-
+        std::vector<std::string> getResourceHosts(const std::string& resource);
         std::map<std::string, std::vector<std::string>> getAllResources();
+
 
     private:
         std::map<std::string, std::vector<std::string>> resourceMap_;
