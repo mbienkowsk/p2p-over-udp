@@ -167,8 +167,6 @@ UdpListener::ReceivedPacket UdpListener::tryRecv(char *buffer) {
     if (received >= 0) {
         spdlog::info("Received {} bytes from {}:{}", received, clientIp,
                      ntohs(clientAddr.sin_port));
-    } else {
-        spdlog::error("Failed to receive data");
     }
     // return received;
     UdpListener::ReceivedPacket receivedPacket = {};

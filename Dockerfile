@@ -33,4 +33,6 @@ COPY . .
 RUN mkdir -p out
 WORKDIR /app/out
 
+EXPOSE 8000
+
 CMD [ "just", "build" ]

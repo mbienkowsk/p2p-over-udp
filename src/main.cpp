@@ -15,7 +15,7 @@
 #include <unistd.h>
 
 #define PORT 8000
-#define BROADCAST_ADDR "172.22.255.255"
+#define BROADCAST_ADDR "172.21.255.255"
 #define RESOURCE_FOLDER "../host_resources"
 
 /// Cleanup function that waits for the subthreads to finish and logs
