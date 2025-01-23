@@ -5,10 +5,10 @@
 #include <spdlog/spdlog.h>
 #include <mutex>
 
-void ResourceMap::updateResources(const std::string& senderIP, const std::vector<std::string>& resources){
+void ResourceMap::updateResources(const std::string& peerIP, const std::vector<std::string>& resources){
     std::lock_guard<std::mutex> lock(mutex_);
-    resourceMap_[senderIP] = resources;
-    spdlog::info("Updated resources for peer {}: {}", senderIP, join(resources, ", "));
+    resourceMap_[peerIP] = resources;
+    spdlog::info("Updated resources for peer {}: {}", peerIP, join(resources, ", "));
 
 }
 
@@ -17,6 +17,7 @@ std::vector<std::string> ResourceMap::getPeerResources(const std::string& peerIP
     if (resourceMap_.find(peerIP) != resourceMap_.end()){
         return resourceMap_[peerIP];
     }
+    spdlog::warn("Peer {} not found", peerIP);
     return {};
 }
 
@@ -34,18 +35,27 @@ std::vector<std::string> ResourceMap::getResourceHosts(const std::string& search
     return resourceHosts;
 }
 
+void ResourceMap::removePeer(const std::string& peerIP) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (resourceMap_.erase(peerIP) > 0) {
+        spdlog::info("Removed peer {}", peerIP);
+    } else {
+        spdlog::warn("Cannot remove, peer {} not found", peerIP);
+    }
+}
+
 std::map<std::string, std::vector<std::string>> ResourceMap::getAllResources() {
     std::lock_guard<std::mutex> lock(mutex_);
     return resourceMap_;
 }
 
 std::string ResourceMap::join(const std::vector<std::string>& vec, const std::string& delimiter) {
-    std::string result;
+    std::string joined;
     for (const auto& elem : vec){
-        if (!result.empty()) result += delimiter;
-        result += elem;
+        if (!joined.empty()) joined += delimiter;
+        joined += elem;
     }
-    return result;
+    return joined;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::map<std::string, std::vector<std::string>> &resourceMap) {
