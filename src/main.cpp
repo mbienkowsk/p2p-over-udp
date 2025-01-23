@@ -8,36 +8,52 @@
 #include <thread>
 
 #include "cli/Cli.h"
+#include "log/Log.h"
 #include "network/BroadcastSender.h"
 #include "network/Downloader.h"
 #include "network/UdpSender.h"
 #include "resources/resource.h"
 #include "serialization/Utils.h"
-#include "log/Log.h"
 #include <memory>
 #include <unistd.h>
 
-#define LISTENER_PORT 8000
 #define PORT 12345
 #define BROADCAST_ADDR "172.21.255.255"
+#define RESOURCE_FOLDER "../host_resources"
 
-int main() {
-  auto b = BroadcastSender(PORT, BROADCAST_ADDR);
-  auto broadcast_thread = b.make_worker([]() {
-    // TODO: make real function for this
-    return ResourceAnnounceMessage({"resource1", "resource2"});
-  });
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <UDP Listen Port>" << std::endl;
+        return 1;
+    }
 
-  UdpSender sender("0.0.0.0", 8000);
-  sender.sendMessage(ResourceDataMessage(Header(MessageType::RESOURCE_DATA),
-                                         "resource1",
-                                         std::vector<std::byte>{std::byte(0)}));
+    const int LISTENER_PORT = std::stoi(argv[1]);
 
-  sender.sendMessage(ResourceDataMessage(Header(MessageType::RESOURCE_DATA),
-                                         "resource2",
-                                         std::vector<std::byte>{std::byte(0)}));
+    setup_logger(true);
 
-  broadcast_thread.join();
+    auto b = BroadcastSender(PORT, BROADCAST_ADDR);
+
+    auto localResourceManager =
+        std::make_shared<LocalResourceManager>(RESOURCE_FOLDER);
+
+    auto peerResourceMap = std::make_shared<PeerResourceMap>();
+
+    auto listener =
+        UdpListener(LISTENER_PORT, localResourceManager, peerResourceMap);
+
+    auto broadcast_thread = b.make_worker([localResourceManager]() {
+        return ResourceAnnounceMessage(localResourceManager->listResources());
+    });
+
+    CLI cli(localResourceManager, peerResourceMap);
+
+    listener.start();
+    auto listener_thread = listener.detached_listen();
+
+    cli.run();
+
+    broadcast_thread.join();
+    listener_thread.join();
 
     spdlog::info("Exiting main");
     return 0;
