@@ -17,6 +17,7 @@ void CLI::run() {
         "  find <filename>\n"
         "  download <host-ip> <filename>\n"
         "  change-resource-folder <new-folder-path>\n"
+        "  help\n"
         "  exit\n\n";
 
     std::cout << "Welcome to the P2P File Sharing CLI!\n";
