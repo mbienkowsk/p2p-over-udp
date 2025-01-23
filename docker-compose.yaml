@@ -1,29 +1,26 @@
-version: '3.8'
-
 services:
-  node1:
-    build: .
-    container_name: node1
-    networks:
-      - p2p_network
-    tty: true
-    stdin_open: true
-    entrypoint: /bin/bash
+  client1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: client1
     expose:
-      - "8000/udp" 
-
-  node2:
-    build: .
-    container_name: node2
+      - "8000/udp" # Makes 8000/udp visible to other containers on the same network
     networks:
-      - p2p_network
-    tty: true
-    stdin_open: true
-    entrypoint: /bin/bash
+      - p2p-net
+    # command: just run 8000 log1.log
+    command: sh
+  client2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: client2
     expose:
       - "8000/udp"
-
-
+    networks:
+      - p2p-net
+    # command: just run 8000 log2.log
+    command: sh
 networks:
-  p2p_network:
+  p2p-net:
     driver: bridge
