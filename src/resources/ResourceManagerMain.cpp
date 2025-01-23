@@ -10,7 +10,8 @@ int main() {
     for (const auto &resource : resources) {
         spdlog::info("{}", resource);
     }
-    spdlog::info("Resource folder: {}", LocalResourceManager.getResourceFolder());
+    spdlog::info("Resource folder: {}",
+                 LocalResourceManager.getResourceFolder());
     if (LocalResourceManager.resourceExists("text1.txt")) {
         spdlog::info("Resource exists");
     } else {

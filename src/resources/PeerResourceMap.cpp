@@ -4,8 +4,8 @@
 #include <spdlog/spdlog.h>
 #include <string>
 
-void PeerResourceMap::updateResources(const std::string &peerIP,
-                                  const std::vector<std::string> &resources) {
+void PeerResourceMap::updateResources(
+    const std::string &peerIP, const std::vector<std::string> &resources) {
     std::lock_guard<std::mutex> lock(mutex_);
     resourceMap_[peerIP] = resources;
     spdlog::info("Updated resources for peer {}: {}", peerIP,
@@ -47,13 +47,14 @@ void PeerResourceMap::removePeer(const std::string &peerIP) {
     }
 }
 
-std::map<std::string, std::vector<std::string>> PeerResourceMap::getAllResources() {
+std::map<std::string, std::vector<std::string>>
+PeerResourceMap::getAllResources() {
     std::lock_guard<std::mutex> lock(mutex_);
     return resourceMap_;
 }
 
 std::string PeerResourceMap::join(const std::vector<std::string> &vec,
-                              const std::string &delimiter) {
+                                  const std::string &delimiter) {
     std::string joined;
     for (const auto &elem : vec) {
         if (!joined.empty())
@@ -63,9 +64,9 @@ std::string PeerResourceMap::join(const std::vector<std::string> &vec,
     return joined;
 }
 
-
-
-std::ostream &operator<<(std::ostream &os, const std::map<std::string, std::vector<std::string>> &PeerResourceMap) {
+std::ostream &operator<<(
+    std::ostream &os,
+    const std::map<std::string, std::vector<std::string>> &PeerResourceMap) {
     // Create an inverted map to group peerIDs by resource
     std::unordered_map<std::string, std::vector<std::string>> resourceToPeers;
 
@@ -76,7 +77,7 @@ std::ostream &operator<<(std::ostream &os, const std::map<std::string, std::vect
             resourceToPeers[resource].push_back(peerID);
         }
     }
-    
+
     for (const auto &pair : resourceToPeers) {
         const std::string &resource = pair.first;
         const std::vector<std::string> &peerIDs = pair.second;

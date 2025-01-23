@@ -15,7 +15,7 @@
 
 CLI::CLI(std::shared_ptr<LocalResourceManager> resourceManager,
          std::shared_ptr<PeerResourceMap> resourceMap)
-    : localResourceManager(resourceManager), peerResourceMap(resourceMap) {};
+    : localResourceManager(resourceManager), peerResourceMap(resourceMap){};
 
 void CLI::run() {
     const std::string HELP_STRING =
@@ -117,15 +117,13 @@ void CLI::handleFind(const std::string &filename) {
 
 void CLI::handleDownload(const std::string &hostIp,
                          const std::string &filename) {
-    UdpSender sender(hostIp, 8000);
-    ResourceRequestMessage msg(Header(MessageType::RESOURCE_REQUEST), filename);
-    {
-        auto downloader = Downloader::create(sender, msg);
-        auto res = downloader->start();
-        if (res)
-            std::cout << "Downloading '" << filename << "' from " << hostIp
-                      << "\n";
-    }
+    auto downloader = Downloader::create(
+        std::make_unique<UdpSender>(hostIp, 8000),
+        std::make_unique<ResourceRequestMessage>(
+            Header(MessageType::RESOURCE_REQUEST), filename));
+    auto res = downloader->start();
+    if (res)
+        std::cout << "Downloading '" << filename << "' from " << hostIp << "\n";
 }
 
 void CLI::handleChangeResourceFolder(const std::string &newFolderPath) {

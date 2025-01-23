@@ -31,13 +31,14 @@ std::vector<std::string> LocalResourceManager::listResources() const {
 }
 
 // check if resource exists
-bool LocalResourceManager::resourceExists(const std::string &resourceName) const {
+bool LocalResourceManager::resourceExists(
+    const std::string &resourceName) const {
     std::string filePath = folder_ + "/" + resourceName;
     return std::filesystem::exists(filePath);
 }
 
 bool LocalResourceManager::saveResource(const std::string &resourceName,
-                                   const std::vector<std::byte> &content) {
+                                        const std::vector<std::byte> &content) {
     std::string filePath = folder_ + "/" + resourceName;
 
     // Check if it already exists

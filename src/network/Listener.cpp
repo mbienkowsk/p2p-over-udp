@@ -76,6 +76,8 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
             localResourceManager->getResource(resourceRequest->resource_name);
 
         UdpSender sender(senderIp, senderPort);
+        spdlog::trace("Sending resource data for: {}",
+                      resourceRequest->resource_name);
         sender.sendMessage(ResourceDataMessage(
             resourceRequest->header, resourceRequest->resource_name,
             // TOOD: Replace this with the actual resource data

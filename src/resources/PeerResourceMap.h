@@ -23,8 +23,8 @@ class PeerResourceMap {
                      const std::string &delimiter);
 };
 
-std::ostream &
-operator<<(std::ostream &os,
-           const std::map<std::string, std::vector<std::string>> &PeerResourceMap);
+std::ostream &operator<<(
+    std::ostream &os,
+    const std::map<std::string, std::vector<std::string>> &PeerResourceMap);
 
 #endif
