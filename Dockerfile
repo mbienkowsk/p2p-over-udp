@@ -4,10 +4,9 @@ FROM ubuntu:22.04 AS base
 # Set non-interactive frontend for apt-get
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update -y
 
 # Install required packages: cmake, clang-format, clang-tidy, build tools, and curl for installing 'just'
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
     cmake \
     clang-format \
     clang-tidy \
@@ -18,6 +17,7 @@ RUN apt-get install -y \
     libboost-all-dev \
     libspdlog-dev \
     git \
+    netcat \
     && rm -rf /var/lib/apt/lists/*
 
 # Install just and update path
@@ -33,6 +33,6 @@ COPY . .
 RUN mkdir -p out
 WORKDIR /app/out
 
-EXPOSE 8000
+EXPOSE 8000/udp
 
 CMD [ "just", "build" ]
