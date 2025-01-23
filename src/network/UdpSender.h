@@ -8,18 +8,17 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-class UdpSender
-{
+class UdpSender {
 private:
-    int sockfd;
-    struct sockaddr_in dest_addr;
+  int sockfd;
+  struct sockaddr_in dest_addr;
 
 public:
-    UdpSender(const std::string &ip, uint16_t port);
+  UdpSender(const std::string &ip, const uint16_t &port);
 
-    ~UdpSender();
+  ~UdpSender();
 
-    void sendMessage(const Message &message);
+  void sendMessage(const Message &message) const;
 };
 
 #endif

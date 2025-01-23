@@ -1,6 +1,6 @@
 #include "UdpSender.h"
 
-UdpSender::UdpSender(const std::string &ip, uint16_t port) {
+UdpSender::UdpSender(const std::string &ip, const uint16_t &port) {
   sockfd = socket(AF_INET, SOCK_DGRAM, 0);
   if (sockfd < 0) {
     throw std::runtime_error("Failed to create socket");
@@ -17,7 +17,7 @@ UdpSender::UdpSender(const std::string &ip, uint16_t port) {
 
 UdpSender::~UdpSender() { close(sockfd); }
 
-void UdpSender::sendMessage(const Message &message) {
+void UdpSender::sendMessage(const Message &message) const {
   std::vector<std::byte> serializedMessage = message.serialize();
 
   ssize_t sentBytes =
