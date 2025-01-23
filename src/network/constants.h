@@ -1,0 +1,5 @@
+#ifndef NETWORK_CONSTANTS_H
+#define NETWORK_CONSTANTS_H
+#define BROADCAST_ADDR "255.255.255.255"
+#define PORT 8000
+#endif

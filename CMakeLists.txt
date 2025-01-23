@@ -21,6 +21,7 @@ add_library(network_lib
     ${SOURCE_DIR}/resources/LocalResourceManager.cpp
     ${SOURCE_DIR}/cli/Cli.cpp
     ${SOURCE_DIR}/network/Downloader.cpp
+    ${SOURCE_DIR}/network/constants.h
 )
 
 # Define sources and executable

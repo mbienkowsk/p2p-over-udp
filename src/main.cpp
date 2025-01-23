@@ -1,3 +1,4 @@
+#include "network/BroadcastSender.h"
 #include "network/Listener.h"
 #include "serialization/Utils.h"
 #include "spdlog/spdlog.h"
@@ -9,13 +10,11 @@
 
 #include "cli/Cli.h"
 #include "log/Log.h"
-#include "network/BroadcastSender.h"
+#include "network/constants.h"
 #include "serialization/Utils.h"
 #include <memory>
 #include <unistd.h>
 
-#define PORT 8000
-#define BROADCAST_ADDR "172.21.255.255"
 #define RESOURCE_FOLDER "../host_resources"
 
 /// Cleanup function that waits for the subthreads to finish and logs
@@ -60,15 +59,14 @@ int handleArgs(int argc, char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-    auto listenerPort = handleArgs(argc, argv);
+    handleArgs(argc, argv);
 
     // Initialize all components
     auto broadcastSender = BroadcastSender(PORT, BROADCAST_ADDR);
     auto localResourceManager =
         std::make_shared<LocalResourceManager>(RESOURCE_FOLDER);
     auto peerResourceMap = std::make_shared<PeerResourceMap>();
-    auto listener =
-        UdpListener(listenerPort, localResourceManager, peerResourceMap);
+    auto listener = UdpListener(PORT, localResourceManager, peerResourceMap);
 
     // Initialize stop conditions for subthreads
     auto broadcastStop = std::make_shared<std::atomic_bool>(false);

@@ -2,15 +2,13 @@
 #include "../network/Downloader.h"
 #include "../network/Message.h"
 #include "../network/UdpSender.h"
+#include "../network/constants.h"
 #include "../resources/LocalResourceManager.h"
 #include "../resources/PeerResourceMap.h"
-#include <algorithm>
-#include <chrono>
 #include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
-#include <thread>
 #include <vector>
 
 CLI::CLI(std::shared_ptr<LocalResourceManager> resourceManager,
@@ -118,7 +116,7 @@ void CLI::handleFind(const std::string &filename) {
 void CLI::handleDownload(const std::string &hostIp,
                          const std::string &filename) {
     auto downloader = Downloader::create(
-        std::make_unique<UdpSender>(hostIp, 8000),
+        std::make_unique<UdpSender>(hostIp, PORT),
         std::make_unique<ResourceRequestMessage>(
             Header(MessageType::RESOURCE_REQUEST), filename));
     auto res = downloader->start();
