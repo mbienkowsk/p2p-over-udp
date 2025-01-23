@@ -3,14 +3,14 @@
 #include <string>
 #include <vector>
 
-int main(){
+int main() {
     ResourceManager resourceManager("../host_resources");
     std::vector<std::string> resources = resourceManager.listResources();
-    for (const auto& resource : resources) {
+    for (const auto &resource : resources) {
         spdlog::info("{}", resource);
     }
     spdlog::info("Resource folder: {}", resourceManager.getResourceFolder());
-    if(resourceManager.resourceExists("text1.txt")){
+    if (resourceManager.resourceExists("text1.txt")) {
         spdlog::info("Resource exists");
     } else {
         spdlog::info("Resource doesnt exist");
