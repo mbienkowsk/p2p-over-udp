@@ -28,6 +28,8 @@ bool Downloader::start() {
                 spdlog::error(
                     "Couldn't download: '{}', after {} retries. Aborting.",
                     this->msg->resource_name, retry);
+                // TODO: failing to download resource due to unavailable host
+                // segfaults on exit
                 this->stopFlag = true;
                 this->errorReason = "Failed to send message after 5 retries";
                 return;
