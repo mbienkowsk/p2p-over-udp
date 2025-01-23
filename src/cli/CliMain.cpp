@@ -4,8 +4,8 @@
 #include <iostream>
 #include <map>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 int main() {
     LocalResourceManager LocalResourceManager("../host_resources");
@@ -21,5 +21,4 @@ int main() {
     CLI CLI(LocalResourceManager, PeerResourceMap);
 
     CLI.run();
-
-    };
+};
