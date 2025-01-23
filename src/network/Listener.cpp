@@ -58,19 +58,19 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
   } else if (auto *resourceRequest =
                  dynamic_cast<ResourceRequestMessage *>(message.get())) {
     std::cout << *resourceRequest << std::endl;
+    std::vector<std::byte> resourceData = resourceManager.getResource(resourceRequest->resource_name);
 
     UdpSender sender(senderIp, senderPort);
     sender.sendMessage(ResourceDataMessage(
         resourceRequest->header, resourceRequest->resource_name,
-        // TOOD: Replace this with the actual resource data
-        std::vector<std::byte>{std::byte(0)}));
+        resourceData));
   } else if (auto *resourceData =
                  dynamic_cast<ResourceDataMessage *>(message.get())) {
     std::cout << *resourceData << std::endl;
     std::string rName = resourceData->resourceName;
     std::vector<std::byte> rData = resourceData->resourceData;
 
-    resourceManager.saveResource(rName, std::string(reinterpret_cast<const char*>(rData.data()), rData.size()));
+    resourceManager.saveResource(rName, rData);
   } else {
     std::cout << "Unknown Message Type" << std::endl;
   }

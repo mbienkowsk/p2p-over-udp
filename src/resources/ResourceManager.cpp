@@ -37,7 +37,7 @@ bool ResourceManager::resourceExists(const std::string& resourceName) const {
     return std::filesystem::exists(filePath);
 }
 
-void ResourceManager::saveResource(const std::string& resourceName, const std::string& content) {
+void ResourceManager::saveResource(const std::string& resourceName, const std::vector<std::byte>& content) {
     std::string filePath = folder_ + "/" + resourceName;
 
     // Check if it already exists
@@ -46,16 +46,51 @@ void ResourceManager::saveResource(const std::string& resourceName, const std::s
         return;
     }
 
-    // Saving resource as file
-    std::ofstream outFile(filePath);
-    if (outFile.is_open()) {
-        outFile << content;
-        outFile.close();
-        spdlog::info("Resource {} has been saved", resourceName);
-    } else {
-        spdlog::error("Couldnt save {}", resourceName);
+    std::ofstream file(filePath, std::ios::binary);
+    if (!file) {
+        std::cerr << "Couldnt write resource: " << filePath << '\n';
+        return;
+    }
+
+    // Write the data to the file
+    file.write(reinterpret_cast<const char*>(content.data()), content.size());
+
+    if (!file) {
+        std::cerr << "Couldnt save resource: " << resourceName << '\n';
     }
 }
+
+std::vector<std::byte> ResourceManager::getResource(const std::string& resourceName) {
+    std::string filePath = folder_ + "/" + resourceName;
+
+    std::ifstream file(filePath, std::ios::binary | std::ios::ate);
+    if (!file) {
+        std::cerr << "Cannot open resource" << resourceName << '\n';
+        return {};
+    }
+
+    // Get the size of the file
+    std::streamsize fileSize = file.tellg();
+    if (fileSize <= 0) {
+        std::cerr << "Empty resource: " << resourceName << '\n';
+        return {};
+    }
+
+    // Resize the vector to hold the file content
+    std::vector<std::byte> resourceContent(static_cast<size_t>(fileSize));
+
+    // Seek back to the beginning of the file
+    file.seekg(0, std::ios::beg);
+
+    // Read the file into the vector
+    if (!file.read(reinterpret_cast<char*>(resourceContent.data()), fileSize)) {
+        std::cerr << "Cannot read resource: " << resourceName << '\n';
+        return {};
+    }
+    
+    return resourceContent;
+}
+
 
 // Removing resource
 void ResourceManager::removeResource(const std::string& resourceName) {
