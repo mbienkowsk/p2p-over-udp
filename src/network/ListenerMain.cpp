@@ -7,26 +7,29 @@
 int main() {
     int port = 8000;
 
-    UdpListener listener(port);
+    auto localResourceManager =
+        std::make_shared<LocalResourceManager>("../host_resources");
 
-  listener.start();
+    UdpListener listener(port, localResourceManager);
 
-  UdpSender sender("0.0.0.0", 8000);
-  ResourceRequestMessage msg(Header(MessageType::RESOURCE_REQUEST),
-                             "resource1");
-  {
-    auto d1 = Downloader::create(sender, msg);
-    auto res = d1->start();
-    std::cout << "Downloader started: " << res << std::endl;
-  }
+    listener.start();
 
-  UdpSender sender2("0.0.0.0", 8000);
-  ResourceRequestMessage msg2(Header(MessageType::RESOURCE_REQUEST),
-                              "resource1");
-  auto d2 = Downloader::create(sender2, msg2);
-  auto res2 = d2->start();
+    UdpSender sender("0.0.0.0", 8000);
+    ResourceRequestMessage msg(Header(MessageType::RESOURCE_REQUEST),
+                               "resource1");
+    {
+        auto d1 = Downloader::create(sender, msg);
+        auto res = d1->start();
+        std::cout << "Downloader started: " << res << std::endl;
+    }
 
-  listener.listen();
+    UdpSender sender2("0.0.0.0", 8000);
+    ResourceRequestMessage msg2(Header(MessageType::RESOURCE_REQUEST),
+                                "resource1");
+    auto d2 = Downloader::create(sender2, msg2);
+    auto res2 = d2->start();
+
+    listener.listen();
 
     return 0;
 }

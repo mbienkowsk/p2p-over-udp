@@ -7,31 +7,40 @@
 #include "ThreadSafeHashMap.h"
 #include <memory>
 #include <netinet/in.h>
+#include <thread>
 #include <unistd.h>
 
 using SMap = std::shared_ptr<ThreadSafeHashMap>;
 
 class UdpListener {
   public:
-    explicit UdpListener(int port);
+    UdpListener(int port,
+                std::shared_ptr<LocalResourceManager> localResourceManager,
+                std::shared_ptr<PeerResourceMap> peerResourceMap);
+
     ~UdpListener();
 
     void start();
     void listen();
+    std::thread detached_listen();
+
     static SMap runningDownloads;
 
-private:
-  struct ReceivedPacket {
-    ssize_t nBytes;
-    std::string senderIp;
-    uint16_t senderPort;
-  };
+  private:
+    struct ReceivedPacket {
+        ssize_t nBytes;
+        std::string senderIp;
+        uint16_t senderPort;
+    };
 
     static const int MAX_MSG_SIZE = 65505;
+
+    std::shared_ptr<PeerResourceMap> peerResourceMap;
+    std::shared_ptr<LocalResourceManager> localResourceManager;
+
     int port;
     int sockfd;
-    PeerResourceMap peerResourceMap;
-    LocalResourceManager localResourceManager;
+
     void handleMessage(std::unique_ptr<Message> message,
                        const std::string &senderIp, const uint16_t &senderPort);
     void checkSockInit() const;

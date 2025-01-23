@@ -10,8 +10,11 @@
 #include <unistd.h>
 #include <vector>
 
-UdpListener::UdpListener(int port)
-    : port(port), sockfd(-1), localResourceManager("../host_resources") {}
+UdpListener::UdpListener(
+    int port, std::shared_ptr<LocalResourceManager> localResourceManager,
+    std::shared_ptr<PeerResourceMap> peerResourceMap)
+    : peerResourceMap(peerResourceMap),
+      localResourceManager(localResourceManager), port(port), sockfd(-1) {}
 
 UdpListener::~UdpListener() {
     if (sockfd >= 0) {
@@ -31,8 +34,6 @@ void UdpListener::listen() {
     char buffer[MAX_MSG_SIZE];
 
     while (true) {
-        std::cout << "Current resource map:\n"
-                  << peerResourceMap.getAllResources() << std::endl;
         auto receivedPacket = tryRecv(buffer);
         if (receivedPacket.nBytes < 0) {
             // already logged it
@@ -51,40 +52,45 @@ void UdpListener::listen() {
         }
     }
 }
+std::thread UdpListener::detached_listen() {
+    return std::thread(&UdpListener::listen, this);
+}
+
 void UdpListener::handleMessage(std::unique_ptr<Message> message,
                                 const std::string &senderIp,
                                 const uint16_t &senderPort) {
     if (auto *resourceAnnounce =
             dynamic_cast<ResourceAnnounceMessage *>(message.get())) {
         std::cout << *resourceAnnounce << std::endl;
-        peerResourceMap.updateResources(senderIp, resourceAnnounce->resourceNames);
+        peerResourceMap->updateResources(senderIp,
+                                         resourceAnnounce->resourceNames);
     } else if (auto *resourceRequest =
                    dynamic_cast<ResourceRequestMessage *>(message.get())) {
         std::cout << *resourceRequest << std::endl;
         std::vector<std::byte> resourceData =
-            localResourceManager.getResource(resourceRequest->resource_name);
+            localResourceManager->getResource(resourceRequest->resource_name);
 
-    UdpSender sender(senderIp, senderPort);
-    sender.sendMessage(ResourceDataMessage(
-        resourceRequest->header, resourceRequest->resource_name,
-        // TOOD: Replace this with the actual resource data
-        std::vector<std::byte>{std::byte(0)}));
-  } else if (auto *resourceData =
-                 dynamic_cast<ResourceDataMessage *>(message.get())) {
-    std::cout << *resourceData << std::endl;
-    // TODO: save the resource to disk
-    auto downloader =
-        Downloader::getRunningDownload(resourceData->resourceName);
-    if (!downloader) {
-      spdlog::warn("Received not requested resource. Dropping it...: {}",
-                   resourceData->resourceName);
-      return;
+        UdpSender sender(senderIp, senderPort);
+        sender.sendMessage(ResourceDataMessage(
+            resourceRequest->header, resourceRequest->resource_name,
+            // TOOD: Replace this with the actual resource data
+            std::vector<std::byte>{std::byte(0)}));
+    } else if (auto *resourceData =
+                   dynamic_cast<ResourceDataMessage *>(message.get())) {
+        std::cout << *resourceData << std::endl;
+        // TODO: save the resource to disk
+        auto downloader =
+            Downloader::getRunningDownload(resourceData->resourceName);
+        if (!downloader) {
+            spdlog::warn("Received not requested resource. Dropping it...: {}",
+                         resourceData->resourceName);
+            return;
+        }
+        downloader->stop();
+        std::cout << "listener after stop" << std::endl;
+    } else {
+        std::cout << "Unknown Message Type" << std::endl;
     }
-    downloader->stop();
-    std::cout << "listener after stop" << std::endl;
-  } else {
-    std::cout << "Unknown Message Type" << std::endl;
-  }
 }
 
 void UdpListener::checkSockInit() const {
