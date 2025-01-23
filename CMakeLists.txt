@@ -18,6 +18,7 @@ add_library(network_lib
     ${SOURCE_DIR}/serialization/Utils.cpp
     ${SOURCE_DIR}/network/ThreadSafeHashMap.cpp
     ${SOURCE_DIR}/resources/ResourceMap.cpp
+    ${SOURCE_DIR}/resources/ResourceManager.cpp
 )
 
 # Define sources and executable
@@ -31,6 +32,7 @@ set(SOURCES
     ${SOURCE_DIR}/network/UdpSender.cpp
     ${SOURCE_DIR}/network/ThreadSafeHashMap.cpp
     ${SOURCE_DIR}/resources/ResourceMap.cpp
+    ${SOURCE_DIR}/resources/ResourceManager.cpp
 )
 add_executable(${PROJECT_NAME} ${SOURCES})
 
