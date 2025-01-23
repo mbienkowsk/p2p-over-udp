@@ -1,10 +1,10 @@
-#include "ResourceMap.h"
+#include "PeerResourceMap.h"
 #include <map>
 #include <mutex>
 #include <spdlog/spdlog.h>
 #include <string>
 
-void ResourceMap::updateResources(const std::string &peerIP,
+void PeerResourceMap::updateResources(const std::string &peerIP,
                                   const std::vector<std::string> &resources) {
     std::lock_guard<std::mutex> lock(mutex_);
     resourceMap_[peerIP] = resources;
@@ -13,7 +13,7 @@ void ResourceMap::updateResources(const std::string &peerIP,
 }
 
 std::vector<std::string>
-ResourceMap::getPeerResources(const std::string &peerIP) {
+PeerResourceMap::getPeerResources(const std::string &peerIP) {
     std::lock_guard<std::mutex> lock(mutex_);
     if (resourceMap_.find(peerIP) != resourceMap_.end()) {
         return resourceMap_[peerIP];
@@ -23,7 +23,7 @@ ResourceMap::getPeerResources(const std::string &peerIP) {
 }
 
 std::vector<std::string>
-ResourceMap::getResourceHosts(const std::string &searchedResource) {
+PeerResourceMap::getResourceHosts(const std::string &searchedResource) {
     std::lock_guard<std::mutex> lock(mutex_);
     std::vector<std::string> resourceHosts;
     for (const auto &entry : resourceMap_) {
@@ -38,7 +38,7 @@ ResourceMap::getResourceHosts(const std::string &searchedResource) {
     return resourceHosts;
 }
 
-void ResourceMap::removePeer(const std::string &peerIP) {
+void PeerResourceMap::removePeer(const std::string &peerIP) {
     std::lock_guard<std::mutex> lock(mutex_);
     if (resourceMap_.erase(peerIP) > 0) {
         spdlog::info("Removed peer {}", peerIP);
@@ -47,12 +47,12 @@ void ResourceMap::removePeer(const std::string &peerIP) {
     }
 }
 
-std::map<std::string, std::vector<std::string>> ResourceMap::getAllResources() {
+std::map<std::string, std::vector<std::string>> PeerResourceMap::getAllResources() {
     std::lock_guard<std::mutex> lock(mutex_);
     return resourceMap_;
 }
 
-std::string ResourceMap::join(const std::vector<std::string> &vec,
+std::string PeerResourceMap::join(const std::vector<std::string> &vec,
                               const std::string &delimiter) {
     std::string joined;
     for (const auto &elem : vec) {
@@ -63,15 +63,36 @@ std::string ResourceMap::join(const std::vector<std::string> &vec,
     return joined;
 }
 
-std::ostream &
-operator<<(std::ostream &os,
-           const std::map<std::string, std::vector<std::string>> &resourceMap) {
-    for (const auto &pair : resourceMap) {
-        os << pair.first << ": ";
+
+
+std::ostream &operator<<(std::ostream &os, const std::map<std::string, std::vector<std::string>> &PeerResourceMap) {
+    // Create an inverted map to group peerIDs by resource
+    std::unordered_map<std::string, std::vector<std::string>> resourceToPeers;
+
+    // Populate the inverted map
+    for (const auto &pair : PeerResourceMap) {
+        const std::string &peerID = pair.first;
         for (const auto &resource : pair.second) {
-            os << resource << " ";
+            resourceToPeers[resource].push_back(peerID);
         }
-        os << std::endl;
     }
+    
+    for (const auto &pair : resourceToPeers) {
+        const std::string &resource = pair.first;
+        const std::vector<std::string> &peerIDs = pair.second;
+
+        os << resource << std::endl;
+        os << "[";
+
+        for (size_t i = 0; i < peerIDs.size(); ++i) {
+            os << peerIDs[i];
+            if (i < peerIDs.size() - 1) {
+                os << ", ";
+            }
+        }
+
+        os << "]" << std::endl << std::endl;
+    }
+
     return os;
 }

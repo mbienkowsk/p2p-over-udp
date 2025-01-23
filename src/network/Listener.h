@@ -1,8 +1,8 @@
 #ifndef UDP_LISTENER_H
 #define UDP_LISTENER_H
 
-#include "../resources/ResourceManager.h"
-#include "../resources/ResourceMap.h"
+#include "../resources/LocalResourceManager.h"
+#include "../resources/PeerResourceMap.h"
 #include "Message.h"
 #include "ThreadSafeHashMap.h"
 #include <memory>
@@ -30,8 +30,8 @@ class UdpListener {
     static const int MAX_MSG_SIZE = 65505;
     int port;
     int sockfd;
-    ResourceMap resourceMap;
-    ResourceManager resourceManager;
+    PeerResourceMap peerResourceMap;
+    LocalResourceManager localResourceManager;
     void handleMessage(std::unique_ptr<Message> message,
                        const std::string &senderIp, const uint16_t &senderPort);
     void checkSockInit() const;

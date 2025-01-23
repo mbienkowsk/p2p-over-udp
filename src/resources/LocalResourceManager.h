@@ -1,23 +1,23 @@
-#ifndef RESOURCEMANAGER_H
-#define RESOURCEMANAGER_H
+#ifndef LOCALRESOURCEMANAGER_H
+#define LOCALRESOURCEMANAGER_H
 
 #include <spdlog/spdlog.h>
 #include <string>
 #include <vector>
 
-class ResourceManager {
+class LocalResourceManager {
   private:
     std::string folder_;
 
   public:
-    ResourceManager(const std::string &folderPath);
+    LocalResourceManager(const std::string &folderPath);
     std::vector<std::string> listResources() const;
     bool resourceExists(const std::string &resourceName) const;
-    void saveResource(const std::string &resourceName,
+    bool saveResource(const std::string &resourceName,
                       const std::vector<std::byte> &content);
     std::vector<std::byte> getResource(const std::string &resourceName);
-    void removeResource(const std::string &resourceName);
-    void setResourceFolder(const std::string &newFolderPath);
+    bool removeResource(const std::string &resourceName);
+    bool setResourceFolder(const std::string &newFolderPath);
     std::string getResourceFolder() const;
 };
 

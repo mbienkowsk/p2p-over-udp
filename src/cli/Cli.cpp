@@ -1,0 +1,114 @@
+#include "Cli.h"
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <algorithm>
+#include <chrono>
+#include <thread>
+#include "../resources/LocalResourceManager.h"
+#include "../resources/PeerResourceMap.h"
+
+CLI::CLI(LocalResourceManager& resourceManager, PeerResourceMap& resourceMap) : localResourceManager(resourceManager), peerResourceMap(resourceMap) {};
+
+void CLI::run() {
+    const std::string HELP_STRING = 
+        "Available commands:\n"
+        "  list-resources\n"
+        "  find <filename>\n"
+        "  download <host-ip> <filename>\n"
+        "  change-resource-folder <new-folder-path>\n"
+        "  exit\n\n";
+
+    std::cout << "Welcome to the P2P File Sharing CLI!\n";
+    std::cout << HELP_STRING;
+
+    
+    while (true) {
+        std::cout << "> ";
+
+        // Read a line of input from the user
+        std::string line;
+        if (!std::getline(std::cin, line)) {
+            break;
+        }
+
+        if (line.empty()) {
+            continue;
+        }
+
+        // Split the line into tokens
+        std::istringstream iss(line);
+        std::vector<std::string> tokens;
+        std::string token;
+        while (iss >> token) {
+            tokens.push_back(token);
+        }
+
+        if (tokens.empty()) {
+            continue;
+        }
+
+        // The command is the first token
+        const auto &cmd = tokens[0];
+
+        // Dispatch to command handlers
+        if (cmd == "exit") {
+            std::cout << "Exiting CLI.\n";
+            break;
+        } 
+        else if (cmd == "list-resources") {
+            handleListPeerResources();
+        }
+        else if (cmd == "find") {
+            if (tokens.size() < 2) {
+                std::cerr << "Usage: find <filename>\n";
+            } else {
+                handleFind(tokens[1]);
+            }
+        }
+        else if (cmd == "download") {
+            if (tokens.size() < 3) {
+                std::cerr << "Usage: download <host-ip> <filename>\n";
+            } else {
+                handleDownload(tokens[1], tokens[2]);
+            }
+        }
+        else if (cmd == "change-resource-folder") {
+            if (tokens.size() < 2) {
+                std::cerr << "Usage: change-resource-folder <new-folder-path>\n";
+            } else {
+                handleChangeResourceFolder(tokens[1]);
+            }
+        }
+        else if (cmd == "help") {
+            std::cout << HELP_STRING;
+        }
+        else {
+            std::cerr << "Unknown command: " << cmd << "\n";
+        }
+    }
+}
+
+void CLI::handleListPeerResources() {
+    std::cout << "\nListing resources available for download:\n\n";
+    std::cout << peerResourceMap.getAllResources() << "\n";
+}
+
+void CLI::handleFind(const std::string &filename) {
+    std::cout << "Broadcasted request for file: '" << filename << "'\n";
+    // TODO: Implement actual network broadcast
+}
+
+void CLI::handleDownload(const std::string &hostIp, const std::string &filename) {
+    std::cout << "Downloading '" << filename 
+                  << "' from host: " << hostIp << "\n";
+    // TODO: Implement actual file download
+}
+
+void CLI::handleChangeResourceFolder(const std::string &newFolderPath) {
+    if (localResourceManager.setResourceFolder(newFolderPath)) {
+        std::cout << "Resource folder changed to: " << newFolderPath << "\n";
+    } else {
+        std::cerr << "Failed to change resource folder to: " << newFolderPath << "\n" << "Please check if the folder exists.\n";
+    }
+}

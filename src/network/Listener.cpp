@@ -10,7 +10,7 @@
 #include <vector>
 
 UdpListener::UdpListener(int port)
-    : port(port), sockfd(-1), resourceManager("../host_resources") {}
+    : port(port), sockfd(-1), localResourceManager("../host_resources") {}
 
 UdpListener::~UdpListener() {
     if (sockfd >= 0) {
@@ -31,7 +31,7 @@ void UdpListener::listen() {
 
     while (true) {
         std::cout << "Current resource map:\n"
-                  << resourceMap.getAllResources() << std::endl;
+                  << peerResourceMap.getAllResources() << std::endl;
         auto receivedPacket = tryRecv(buffer);
         if (receivedPacket.nBytes < 0) {
             // already logged it
@@ -56,12 +56,12 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
     if (auto *resourceAnnounce =
             dynamic_cast<ResourceAnnounceMessage *>(message.get())) {
         std::cout << *resourceAnnounce << std::endl;
-        resourceMap.updateResources(senderIp, resourceAnnounce->resourceNames);
+        peerResourceMap.updateResources(senderIp, resourceAnnounce->resourceNames);
     } else if (auto *resourceRequest =
                    dynamic_cast<ResourceRequestMessage *>(message.get())) {
         std::cout << *resourceRequest << std::endl;
         std::vector<std::byte> resourceData =
-            resourceManager.getResource(resourceRequest->resource_name);
+            localResourceManager.getResource(resourceRequest->resource_name);
 
         UdpSender sender(senderIp, senderPort);
         sender.sendMessage(ResourceDataMessage(resourceRequest->header,
@@ -73,7 +73,7 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
         std::string rName = resourceData->resourceName;
         std::vector<std::byte> rData = resourceData->resourceData;
 
-        resourceManager.saveResource(rName, rData);
+        localResourceManager.saveResource(rName, rData);
     } else {
         std::cout << "Unknown Message Type" << std::endl;
     }

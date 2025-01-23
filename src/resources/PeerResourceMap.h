@@ -1,12 +1,12 @@
-#ifndef RESOURCEMAP_H
-#define RESOURCEMAP_H
+#ifndef PEERRESOURCEMAP_H
+#define PEERRESOURCEMAP_H
 
 #include <map>
 #include <mutex>
 #include <spdlog/spdlog.h>
 #include <string>
 
-class ResourceMap {
+class PeerResourceMap {
   public:
     void updateResources(const std::string &peerIP,
                          const std::vector<std::string> &resources);
@@ -25,6 +25,6 @@ class ResourceMap {
 
 std::ostream &
 operator<<(std::ostream &os,
-           const std::map<std::string, std::vector<std::string>> &resourceMap);
+           const std::map<std::string, std::vector<std::string>> &PeerResourceMap);
 
 #endif

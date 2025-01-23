@@ -17,8 +17,9 @@ add_library(network_lib
     ${SOURCE_DIR}/network/UdpSender.cpp
     ${SOURCE_DIR}/serialization/Utils.cpp
     ${SOURCE_DIR}/network/ThreadSafeHashMap.cpp
-    ${SOURCE_DIR}/resources/ResourceMap.cpp
-    ${SOURCE_DIR}/resources/ResourceManager.cpp
+    ${SOURCE_DIR}/resources/PeerResourceMap.cpp
+    ${SOURCE_DIR}/resources/LocalResourceManager.cpp
+    ${SOURCE_DIR}/cli/Cli.cpp
 )
 
 # Define sources and executable
@@ -28,13 +29,13 @@ set(SOURCES
     ${SOURCE_DIR}/serialization/Utils.cpp
     ${SOURCE_DIR}/network/Message.cpp
     ${SOURCE_DIR}/network/BroadcastSender.cpp
-    ${SOURCE_DIR}/cli/cli.cpp
-    ${SOURCE_DIR}/log/log.h
+    ${SOURCE_DIR}/cli/Cli.cpp
+    ${SOURCE_DIR}/log/Log.h
     ${SOURCE_DIR}/network/Listener.cpp
     ${SOURCE_DIR}/network/UdpSender.cpp
     ${SOURCE_DIR}/network/ThreadSafeHashMap.cpp
-    ${SOURCE_DIR}/resources/ResourceMap.cpp
-    ${SOURCE_DIR}/resources/ResourceManager.cpp
+    ${SOURCE_DIR}/resources/PeerResourceMap.cpp
+    ${SOURCE_DIR}/resources/LocalResourceManager.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -47,6 +48,10 @@ target_link_libraries(UDP_SENDER network_lib)
 
 add_executable(RESOURCE_MANAGER ${SOURCE_DIR}/resources/ResourceManagerMain.cpp)
 target_link_libraries(RESOURCE_MANAGER network_lib spdlog::spdlog)
+
+add_executable(CLI ${SOURCE_DIR}/cli/CliMain.cpp)
+target_link_libraries(CLI network_lib spdlog::spdlog)
+
 
 # Safety compilation flags
 target_compile_options(${PROJECT_NAME} PRIVATE

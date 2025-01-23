@@ -7,11 +7,11 @@
 #include <iostream>
 #include <thread>
 
-#include "cli/cli.h"
+#include "cli/Cli.h"
 #include "network/BroadcastSender.h"
 #include "resources/resource.h"
 #include "serialization/Utils.h"
-#include "log/log.h"
+#include "log/Log.h"
 #include "network/UdpSender.h"
 #include <memory>
 #include <unistd.h>
