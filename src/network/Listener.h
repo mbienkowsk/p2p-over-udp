@@ -20,12 +20,12 @@ class UdpListener {
     void listen();
     static SMap runningDownloads;
 
-  private:
-    struct ReceivedPacket {
-        ssize_t nBytes;
-        std::string senderIp;
-        uint16_t senderPort;
-    };
+private:
+  struct ReceivedPacket {
+    ssize_t nBytes;
+    std::string senderIp;
+    uint16_t senderPort;
+  };
 
     static const int MAX_MSG_SIZE = 65505;
     int port;

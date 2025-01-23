@@ -20,6 +20,7 @@ add_library(network_lib
     ${SOURCE_DIR}/resources/PeerResourceMap.cpp
     ${SOURCE_DIR}/resources/LocalResourceManager.cpp
     ${SOURCE_DIR}/cli/Cli.cpp
+    ${SOURCE_DIR}/network/Downloader.cpp
 )
 
 # Define sources and executable
@@ -36,6 +37,7 @@ set(SOURCES
     ${SOURCE_DIR}/network/ThreadSafeHashMap.cpp
     ${SOURCE_DIR}/resources/PeerResourceMap.cpp
     ${SOURCE_DIR}/resources/LocalResourceManager.cpp
+    ${SOURCE_DIR}/network/Downloader.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

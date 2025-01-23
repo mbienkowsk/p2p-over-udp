@@ -1,4 +1,5 @@
 #include "Listener.h"
+#include "Downloader.h"
 #include "UdpSender.h"
 #include <arpa/inet.h>
 #include <cstring>
@@ -63,20 +64,27 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
         std::vector<std::byte> resourceData =
             localResourceManager.getResource(resourceRequest->resource_name);
 
-        UdpSender sender(senderIp, senderPort);
-        sender.sendMessage(ResourceDataMessage(resourceRequest->header,
-                                               resourceRequest->resource_name,
-                                               resourceData));
-    } else if (auto *resourceData =
-                   dynamic_cast<ResourceDataMessage *>(message.get())) {
-        std::cout << *resourceData << std::endl;
-        std::string rName = resourceData->resourceName;
-        std::vector<std::byte> rData = resourceData->resourceData;
-
-        localResourceManager.saveResource(rName, rData);
-    } else {
-        std::cout << "Unknown Message Type" << std::endl;
+    UdpSender sender(senderIp, senderPort);
+    sender.sendMessage(ResourceDataMessage(
+        resourceRequest->header, resourceRequest->resource_name,
+        // TOOD: Replace this with the actual resource data
+        std::vector<std::byte>{std::byte(0)}));
+  } else if (auto *resourceData =
+                 dynamic_cast<ResourceDataMessage *>(message.get())) {
+    std::cout << *resourceData << std::endl;
+    // TODO: save the resource to disk
+    auto downloader =
+        Downloader::getRunningDownload(resourceData->resourceName);
+    if (!downloader) {
+      spdlog::warn("Received not requested resource. Dropping it...: {}",
+                   resourceData->resourceName);
+      return;
     }
+    downloader->stop();
+    std::cout << "listener after stop" << std::endl;
+  } else {
+    std::cout << "Unknown Message Type" << std::endl;
+  }
 }
 
 void UdpListener::checkSockInit() const {
