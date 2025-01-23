@@ -5,6 +5,7 @@
 #include <asm-generic/socket.h>
 #include <cstring>
 #include <fmt/ranges.h>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <spdlog/spdlog.h>
@@ -83,23 +84,43 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
         UdpSender sender(senderIp, senderPort);
         spdlog::trace("Sending resource data for: {}",
                       resourceRequest->resource_name);
-        sender.sendMessage(ResourceDataMessage(
-            resourceRequest->header, resourceRequest->resource_name,
-            // TOOD: Replace this with the actual resource data
-            std::vector<std::byte>{std::byte(0)}));
+        sender.sendMessage(ResourceDataMessage(resourceRequest->header,
+                                               resourceRequest->resource_name,
+                                               resourceData));
     } else if (auto *resourceData =
                    dynamic_cast<ResourceDataMessage *>(message.get())) {
-        std::cout << *resourceData << std::endl;
-        // TODO: save the resource to disk
-        auto downloader =
-            Downloader::getRunningDownload(resourceData->resourceName);
-        if (!downloader) {
-            spdlog::warn("Received not requested resource. Dropping it...: {}",
-                         resourceData->resourceName);
-            return;
+        spdlog::info("Received resource data for: {}",
+                     resourceData->resourceName);
+
+        std::string filePath = localResourceManager->getResourceFolder() + "/" +
+                               resourceData->resourceName;
+
+        try {
+            std::ofstream outFile(filePath, std::ios::binary);
+            if (!outFile) {
+                throw std::runtime_error("Failed to open file for writing: " +
+                                         filePath);
+            }
+
+            // Write the resource data to the file
+            outFile.write(reinterpret_cast<const char *>(
+                              resourceData->resourceData.data()),
+                          resourceData->resourceData.size());
+            outFile.close();
+
+            spdlog::info("Resource saved to: {}", filePath);
+
+            auto downloader =
+                Downloader::getRunningDownload(resourceData->resourceName);
+            if (downloader) {
+                downloader->stop();
+                spdlog::info("Download completed for resource: {}",
+                             resourceData->resourceName);
+            }
+        } catch (const std::exception &ex) {
+            spdlog::error("Failed to save resource '{}': {}",
+                          resourceData->resourceName, ex.what());
         }
-        downloader->stop();
-        std::cout << "listener after stop" << std::endl;
     } else {
         std::cout << "Unknown Message Type" << std::endl;
     }
