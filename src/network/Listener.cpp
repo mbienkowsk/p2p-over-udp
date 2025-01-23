@@ -17,9 +17,11 @@
 
 UdpListener::UdpListener(
     int port, std::shared_ptr<LocalResourceManager> localResourceManager,
-    std::shared_ptr<PeerResourceMap> peerResourceMap)
+    std::shared_ptr<PeerResourceMap> peerResourceMap,
+    const std::string &myAddress)
     : peerResourceMap(peerResourceMap),
-      localResourceManager(localResourceManager), port(port), sockfd(-1) {}
+      localResourceManager(localResourceManager), port(port), sockfd(-1),
+      myAddress(myAddress) {}
 
 UdpListener::~UdpListener() {
     if (sockfd >= 0) {
@@ -46,7 +48,8 @@ void UdpListener::listen(SABool stop) {
             continue;
         }
 
-        // TODO: operate on char arrays in Message::from_bytes instead
+        // TODO: operate on char arrays in Message::from_bytes instead to avoid
+        // copying this
         std::vector<std::byte> rawData(receivedPacket.nBytes);
         std::memcpy(rawData.data(), buffer, receivedPacket.nBytes);
 
@@ -65,6 +68,13 @@ std::thread UdpListener::detached_listen(SABool stop) {
 void UdpListener::handleMessage(std::unique_ptr<Message> message,
                                 const std::string &senderIp,
                                 const uint16_t &senderPort) {
+
+    // TODO: factor out to separate methods
+    if (senderIp == myAddress) {
+        spdlog::trace("Ignoring message from self");
+        return;
+    }
+
     if (auto *resourceAnnounce =
             dynamic_cast<ResourceAnnounceMessage *>(message.get())) {
         peerResourceMap->updateResources(senderIp,

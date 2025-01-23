@@ -16,7 +16,8 @@ class UdpListener {
   public:
     UdpListener(int port,
                 std::shared_ptr<LocalResourceManager> localResourceManager,
-                std::shared_ptr<PeerResourceMap> peerResourceMap);
+                std::shared_ptr<PeerResourceMap> peerResourceMap,
+                const std::string &myAddress);
 
     ~UdpListener();
 
@@ -43,6 +44,7 @@ class UdpListener {
 
     int port;
     int sockfd;
+    std::string myAddress;
 
     void handleMessage(std::unique_ptr<Message> message,
                        const std::string &senderIp, const uint16_t &senderPort);

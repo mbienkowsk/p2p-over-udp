@@ -1,18 +1,21 @@
+#include "cli/Cli.h"
+#include "log/Log.h"
 #include "network/BroadcastSender.h"
 #include "network/Listener.h"
+#include "network/constants.h"
 #include "serialization/Utils.h"
 #include "spdlog/spdlog.h"
+#include <arpa/inet.h>
 #include <atomic>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/post.hpp>
+#include <cstring>
+#include <ifaddrs.h>
 #include <iostream>
-#include <thread>
-
-#include "cli/Cli.h"
-#include "log/Log.h"
-#include "network/constants.h"
-#include "serialization/Utils.h"
 #include <memory>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <thread>
 #include <unistd.h>
 
 #define RESOURCE_FOLDER "../host_resources"
@@ -40,6 +43,8 @@ void cleanup(std::thread &listenerThread, std::thread &broadcastThread,
     spdlog::info("Both subthreads finished, exiting the program");
 }
 
+// TODO: don't take in port, only the log file since the port is hardcoded to
+// 8000
 int handleArgs(int argc, char *argv[]) {
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <UDP Listen Port>" << std::endl;
@@ -58,15 +63,95 @@ int handleArgs(int argc, char *argv[]) {
     return port;
 }
 
+// TODO: this is helpful for debugging, but should be factored out to some
+// helper instead of hogging main
+void listIPAddresses() {
+    struct ifaddrs *ifAddrStruct = nullptr;
+    struct ifaddrs *ifa = nullptr;
+
+    if (getifaddrs(&ifAddrStruct) == -1) {
+        perror("getifaddrs");
+        return;
+    }
+
+    for (ifa = ifAddrStruct; ifa != nullptr; ifa = ifa->ifa_next) {
+        if (!ifa->ifa_addr) {
+            continue;
+        }
+        if (ifa->ifa_addr->sa_family == AF_INET) {
+            // IPv4 address
+            char addrBuffer[INET_ADDRSTRLEN];
+            void *addrPtr = &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+
+            inet_ntop(AF_INET, addrPtr, addrBuffer, INET_ADDRSTRLEN);
+            spdlog::warn("Interface: {} Address: {}", ifa->ifa_name,
+                         addrBuffer);
+        }
+        // If you also want IPv6, check for AF_INET6
+    }
+
+    if (ifAddrStruct) {
+        freeifaddrs(ifAddrStruct);
+    }
+}
+
+// TODO: same as listIPAddresses, move this somewhere
+std::string getEth0Address() {
+    struct ifaddrs *ifAddrStruct = nullptr;
+    struct ifaddrs *ifa = nullptr;
+
+    if (getifaddrs(&ifAddrStruct) == -1) {
+        // Failed to get interface addresses
+        return "";
+    }
+
+    std::string eth0Address;
+
+    // Walk through list of interfaces
+    for (ifa = ifAddrStruct; ifa != nullptr; ifa = ifa->ifa_next) {
+        if (!ifa->ifa_addr) {
+            continue; // No address here
+        }
+
+        // Look specifically for eth0 + IPv4
+        if (std::strcmp(ifa->ifa_name, "eth0") == 0 &&
+            ifa->ifa_addr->sa_family == AF_INET) {
+
+            char addrBuffer[INET_ADDRSTRLEN];
+            void *addrPtr = &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+
+            // Convert the binary IP to a string
+            if (inet_ntop(AF_INET, addrPtr, addrBuffer, INET_ADDRSTRLEN) !=
+                nullptr) {
+                eth0Address = addrBuffer;
+                break; // Found it, break out
+            }
+        }
+    }
+
+    // Cleanup
+    freeifaddrs(ifAddrStruct);
+    if (eth0Address.empty()) {
+        spdlog::warn("Failed to find eth0 address");
+        throw std::runtime_error("Failed to find eth0 address");
+    }
+
+    return eth0Address; // Empty string if not found
+}
+
 int main(int argc, char *argv[]) {
     handleArgs(argc, argv);
+
+    auto address = getEth0Address();
+    spdlog::info("Eth0 address: {}", address);
 
     // Initialize all components
     auto broadcastSender = BroadcastSender(PORT, BROADCAST_ADDR);
     auto localResourceManager =
         std::make_shared<LocalResourceManager>(RESOURCE_FOLDER);
     auto peerResourceMap = std::make_shared<PeerResourceMap>();
-    auto listener = UdpListener(PORT, localResourceManager, peerResourceMap);
+    auto listener =
+        UdpListener(PORT, localResourceManager, peerResourceMap, address);
 
     // Initialize stop conditions for subthreads
     auto broadcastStop = std::make_shared<std::atomic_bool>(false);
