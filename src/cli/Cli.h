@@ -3,20 +3,23 @@
 
 #include "../resources/LocalResourceManager.h"
 #include "../resources/PeerResourceMap.h"
+#include <memory>
 
 class CLI {
-public:
-    CLI(LocalResourceManager& resourceManager, PeerResourceMap& resourceMap);
+  public:
+    CLI(std::shared_ptr<LocalResourceManager> resourceManager,
+        std::shared_ptr<PeerResourceMap> resourceMap);
     void run();
 
-private:
+  private:
     void handleListPeerResources();
-    void handleFind(const std::string& filename);
-    void handleDownload(const std::string& hostIp, const std::string& filename);
-    void handleChangeResourceFolder(const std::string& newFolderPath);
+    void handleFind(const std::string &filename);
+    void handleDownload(const std::string &hostIp, const std::string &filename);
+    void handleChangeResourceFolder(const std::string &newFolderPath);
 
-    LocalResourceManager& localResourceManager;
-    PeerResourceMap& peerResourceMap;
+    std::shared_ptr<LocalResourceManager> localResourceManager;
+    std::shared_ptr<PeerResourceMap> peerResourceMap;
 };
+;
 
 #endif // CLI_H

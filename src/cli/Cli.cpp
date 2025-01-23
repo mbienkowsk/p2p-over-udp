@@ -1,18 +1,24 @@
 #include "Cli.h"
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <algorithm>
-#include <chrono>
-#include <thread>
+#include "../network/Downloader.h"
+#include "../network/Message.h"
+#include "../network/UdpSender.h"
 #include "../resources/LocalResourceManager.h"
 #include "../resources/PeerResourceMap.h"
+#include <algorithm>
+#include <chrono>
+#include <iostream>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <thread>
+#include <vector>
 
-CLI::CLI(LocalResourceManager& resourceManager, PeerResourceMap& resourceMap) : localResourceManager(resourceManager), peerResourceMap(resourceMap) {};
+CLI::CLI(std::shared_ptr<LocalResourceManager> resourceManager,
+         std::shared_ptr<PeerResourceMap> resourceMap)
+    : localResourceManager(resourceManager), peerResourceMap(resourceMap) {};
 
 void CLI::run() {
-    const std::string HELP_STRING = 
+    const std::string HELP_STRING =
         "Available commands:\n"
         "  list-resources\n"
         "  find <filename>\n"
@@ -24,7 +30,6 @@ void CLI::run() {
     std::cout << "Welcome to the P2P File Sharing CLI!\n";
     std::cout << HELP_STRING;
 
-    
     while (true) {
         std::cout << "> ";
 
@@ -57,35 +62,30 @@ void CLI::run() {
         if (cmd == "exit") {
             std::cout << "Exiting CLI.\n";
             break;
-        } 
-        else if (cmd == "list-resources") {
+        } else if (cmd == "list-resources") {
             handleListPeerResources();
-        }
-        else if (cmd == "find") {
+        } else if (cmd == "find") {
             if (tokens.size() < 2) {
                 std::cerr << "Usage: find <filename>\n";
             } else {
                 handleFind(tokens[1]);
             }
-        }
-        else if (cmd == "download") {
+        } else if (cmd == "download") {
             if (tokens.size() < 3) {
                 std::cerr << "Usage: download <host-ip> <filename>\n";
             } else {
                 handleDownload(tokens[1], tokens[2]);
             }
-        }
-        else if (cmd == "change-resource-folder") {
+        } else if (cmd == "change-resource-folder") {
             if (tokens.size() < 2) {
-                std::cerr << "Usage: change-resource-folder <new-folder-path>\n";
+                std::cerr
+                    << "Usage: change-resource-folder <new-folder-path>\n";
             } else {
                 handleChangeResourceFolder(tokens[1]);
             }
-        }
-        else if (cmd == "help") {
+        } else if (cmd == "help") {
             std::cout << HELP_STRING;
-        }
-        else {
+        } else {
             std::cerr << "Unknown command: " << cmd << "\n";
         }
     }
@@ -93,36 +93,45 @@ void CLI::run() {
 
 void CLI::handleListPeerResources() {
     std::cout << "\nListing resources available for download:\n\n";
-    std::cout << peerResourceMap.getAllResources() << "\n";
+    std::cout << peerResourceMap->getAllResources() << "\n";
 }
 
 void CLI::handleFind(const std::string &filename) {
-    std::vector<std::string> resourceHosts = peerResourceMap.getResourceHosts(filename);
-    
+    std::vector<std::string> resourceHosts =
+        peerResourceMap->getResourceHosts(filename);
+
     std::cout << std::endl;
 
     if (resourceHosts.empty()) {
         std::cout << "No hosts have the file '" << filename << "'\n";
     } else {
         int hostIndex = 1;
-        std::cout << "The file '" << filename << "' is available from the following hosts:\n";
+        std::cout << "The file '" << filename
+                  << "' is available from the following hosts:\n";
         for (const auto &host : resourceHosts) {
-            std::cout << hostIndex << ") "<< host << "\n";
+            std::cout << hostIndex << ") " << host << "\n";
             ++hostIndex;
         }
     }
-    
 }
 
-void CLI::handleDownload(const std::string &hostIp, const std::string &filename) {
-    std::cout << "Downloading '" << filename 
-                  << "' from host: " << hostIp << "\n";
+void CLI::handleDownload(const std::string &hostIp,
+                         const std::string &filename) {
+    UdpSender sender(hostIp, 8000);
+    ResourceRequestMessage msg(Header(MessageType::RESOURCE_REQUEST), filename);
+    {
+        auto downloader = Downloader::create(sender, msg);
+        auto res = downloader->start();
+        std::cout << "Downloader started: " << res << std::endl;
+    }
 }
 
 void CLI::handleChangeResourceFolder(const std::string &newFolderPath) {
-    if (localResourceManager.setResourceFolder(newFolderPath)) {
+    if (localResourceManager->setResourceFolder(newFolderPath)) {
         std::cout << "Resource folder changed to: " << newFolderPath << "\n";
     } else {
-        std::cerr << "Failed to change resource folder to: " << newFolderPath << "\n" << "Please check if the folder exists.\n";
+        std::cerr << "Failed to change resource folder to: " << newFolderPath
+                  << "\n"
+                  << "Please check if the folder exists.\n";
     }
 }
