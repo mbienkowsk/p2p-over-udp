@@ -1,14 +1,19 @@
 #ifndef CLI_H
 #define CLI_H
 
-#include <string>
+#include "../resources/ResourceManager.h"
 
-void runCLI();
+class CLI {
+public:
+    CLI(ResourceManager& resourceManager);
+    void run();
 
-void handleListResources();
+private:
+    void handleListResources();
+    void handleFind(const std::string& filename);
+    void handleDownload(const std::string& hostIp, const std::string& filename);
 
-void handleFind(const std::string &filename);
-
-void handleDownload(const std::string &hostIp, const std::string &filename);
+    ResourceManager& resourceManager;
+};
 
 #endif // CLI_H
