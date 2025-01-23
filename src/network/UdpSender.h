@@ -8,13 +8,12 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-class UdpSender
-{
-private:
+class UdpSender {
+  private:
     int sockfd;
     struct sockaddr_in dest_addr;
 
-public:
+  public:
     UdpSender(const std::string &ip, uint16_t port);
 
     ~UdpSender();

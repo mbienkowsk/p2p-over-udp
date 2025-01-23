@@ -1,10 +1,10 @@
 #ifndef UDP_LISTENER_H
 #define UDP_LISTENER_H
 
+#include "../resources/ResourceManager.h"
+#include "../resources/ResourceMap.h"
 #include "Message.h"
 #include "ThreadSafeHashMap.h"
-#include "../resources/ResourceMap.h"
-#include "../resources/ResourceManager.h"
 #include <memory>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -12,32 +12,32 @@
 using SMap = std::shared_ptr<ThreadSafeHashMap>;
 
 class UdpListener {
-public:
-  explicit UdpListener(int port);
-  ~UdpListener();
+  public:
+    explicit UdpListener(int port);
+    ~UdpListener();
 
-  void start();
-  void listen();
-  static SMap runningDownloads;
+    void start();
+    void listen();
+    static SMap runningDownloads;
 
-private:
-  struct ReceivedPacket {
-    ssize_t nBytes;
-    std::string senderIp;
-    uint16_t senderPort;
-  };
+  private:
+    struct ReceivedPacket {
+        ssize_t nBytes;
+        std::string senderIp;
+        uint16_t senderPort;
+    };
 
-  static const int MAX_MSG_SIZE = 65505;
-  int port;
-  int sockfd;
-  ResourceMap resourceMap;
-  ResourceManager resourceManager;
-  void handleMessage(std::unique_ptr<Message> message,
-                     const std::string &senderIp, const uint16_t &senderPort);
-  void checkSockInit() const;
-  void tryCreateSocket();
-  void tryBindSocket();
-  UdpListener::ReceivedPacket tryRecv(char *buffer);
+    static const int MAX_MSG_SIZE = 65505;
+    int port;
+    int sockfd;
+    ResourceMap resourceMap;
+    ResourceManager resourceManager;
+    void handleMessage(std::unique_ptr<Message> message,
+                       const std::string &senderIp, const uint16_t &senderPort);
+    void checkSockInit() const;
+    void tryCreateSocket();
+    void tryBindSocket();
+    UdpListener::ReceivedPacket tryRecv(char *buffer);
 };
 
 #endif

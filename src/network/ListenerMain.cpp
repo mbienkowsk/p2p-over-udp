@@ -1,12 +1,12 @@
 #include "Listener.h"
 
 int main() {
-  int port = 8000;
+    int port = 8000;
 
-  UdpListener listener(port);
+    UdpListener listener(port);
 
-  listener.start();
-  listener.listen();
+    listener.start();
+    listener.listen();
 
-  return 0;
+    return 0;
 }

@@ -1,28 +1,27 @@
 #include "ResourceManager.h"
-#include <string>
-#include <vector>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <stdexcept>
 #include <spdlog/spdlog.h>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
-
-ResourceManager::ResourceManager(const std::string& folderPath)
+ResourceManager::ResourceManager(const std::string &folderPath)
     : folder_(folderPath) {
     // Check if the folder exists
-    if (!std::filesystem::exists(folder_) || !std::filesystem::is_directory(folder_)) {
+    if (!std::filesystem::exists(folder_) ||
+        !std::filesystem::is_directory(folder_)) {
         throw std::invalid_argument("incorrect path");
     }
 }
-
 
 // Listing all resources
 std::vector<std::string> ResourceManager::listResources() const {
     std::vector<std::string> resourceNames;
 
     // check all resources in folder
-    for (const auto& entry : std::filesystem::directory_iterator(folder_)) {
+    for (const auto &entry : std::filesystem::directory_iterator(folder_)) {
         if (entry.is_regular_file()) {
             resourceNames.push_back(entry.path().filename().string());
         }
@@ -32,12 +31,13 @@ std::vector<std::string> ResourceManager::listResources() const {
 }
 
 // check if resource exists
-bool ResourceManager::resourceExists(const std::string& resourceName) const {
+bool ResourceManager::resourceExists(const std::string &resourceName) const {
     std::string filePath = folder_ + "/" + resourceName;
     return std::filesystem::exists(filePath);
 }
 
-void ResourceManager::saveResource(const std::string& resourceName, const std::vector<std::byte>& content) {
+void ResourceManager::saveResource(const std::string &resourceName,
+                                   const std::vector<std::byte> &content) {
     std::string filePath = folder_ + "/" + resourceName;
 
     // Check if it already exists
@@ -53,14 +53,15 @@ void ResourceManager::saveResource(const std::string& resourceName, const std::v
     }
 
     // Write the data to the file
-    file.write(reinterpret_cast<const char*>(content.data()), content.size());
+    file.write(reinterpret_cast<const char *>(content.data()), content.size());
 
     if (!file) {
         std::cerr << "Couldnt save resource: " << resourceName << '\n';
     }
 }
 
-std::vector<std::byte> ResourceManager::getResource(const std::string& resourceName) {
+std::vector<std::byte>
+ResourceManager::getResource(const std::string &resourceName) {
     std::string filePath = folder_ + "/" + resourceName;
 
     std::ifstream file(filePath, std::ios::binary | std::ios::ate);
@@ -83,17 +84,17 @@ std::vector<std::byte> ResourceManager::getResource(const std::string& resourceN
     file.seekg(0, std::ios::beg);
 
     // Read the file into the vector
-    if (!file.read(reinterpret_cast<char*>(resourceContent.data()), fileSize)) {
+    if (!file.read(reinterpret_cast<char *>(resourceContent.data()),
+                   fileSize)) {
         std::cerr << "Cannot read resource: " << resourceName << '\n';
         return {};
     }
-    
+
     return resourceContent;
 }
 
-
 // Removing resource
-void ResourceManager::removeResource(const std::string& resourceName) {
+void ResourceManager::removeResource(const std::string &resourceName) {
     std::string filePath = folder_ + "/" + resourceName;
 
     // Check if the resource exists
@@ -111,8 +112,9 @@ void ResourceManager::removeResource(const std::string& resourceName) {
 }
 
 // Set a new resource folder
-void ResourceManager::setResourceFolder(const std::string& newFolderPath) {
-    if (!std::filesystem::exists(newFolderPath) || !std::filesystem::is_directory(newFolderPath)) {
+void ResourceManager::setResourceFolder(const std::string &newFolderPath) {
+    if (!std::filesystem::exists(newFolderPath) ||
+        !std::filesystem::is_directory(newFolderPath)) {
         spdlog::error("Incorrect path", newFolderPath);
         return;
     }
@@ -121,6 +123,4 @@ void ResourceManager::setResourceFolder(const std::string& newFolderPath) {
     spdlog::info("Changed resource folder to {}", newFolderPath);
 }
 
-std::string ResourceManager::getResourceFolder() const {
-    return folder_;
-}
+std::string ResourceManager::getResourceFolder() const { return folder_; }
