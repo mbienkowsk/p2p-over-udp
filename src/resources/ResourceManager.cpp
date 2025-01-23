@@ -1,4 +1,12 @@
 #include "ResourceManager.h"
+#include <string>
+#include <vector>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <stdexcept>
+#include <spdlog/spdlog.h>
+
 
 ResourceManager::ResourceManager(const std::string& folderPath)
     : folder_(folderPath) {

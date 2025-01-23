@@ -3,3 +3,4 @@ out
 compile_commands.json
 .cache
 build/
+host_resources

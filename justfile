@@ -18,6 +18,9 @@ run_listener: build
 run_sender: build
   ./Debug/UDP_SENDER
 
+run_manager: build
+  ./Debug/RESOURCE_MANAGER
+
 # Build and run unit tests
 test: build
   ./Debug/all-unit-tests
