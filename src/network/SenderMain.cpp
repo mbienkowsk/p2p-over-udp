@@ -9,7 +9,7 @@ int main() {
         UdpSender sender("127.0.0.1", 8000);
 
         // Create and send ResourceAnnounceMessage
-        Header announceHeader{MessageType::RESOURCE_ANNOUCE, 1};
+        Header announceHeader{MessageType::RESOURCE_ANNOUNCE, 1};
         std::vector<std::string> resources = {"Resource1", "Resource2",
                                               "Resource3"};
         ResourceAnnounceMessage announceMessage(announceHeader, resources);
@@ -29,7 +29,7 @@ int main() {
         std::cout << "Sent: " << dataMessage << std::endl;
 
         // Create and send a second ResourceAnnounceMessage
-        Header announceHeader2{MessageType::RESOURCE_ANNOUCE, 1};
+        Header announceHeader2{MessageType::RESOURCE_ANNOUNCE, 1};
         std::vector<std::string> resources2 = {"Resource1", "Resource4",
                                                "Resource5"};
         ResourceAnnounceMessage announceMessage2(announceHeader2, resources2);

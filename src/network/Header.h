@@ -9,7 +9,7 @@
 const uint8_t PROTOCOL_VERSION = 1;
 
 enum class MessageType : uint8_t {
-    RESOURCE_ANNOUCE = 0,
+    RESOURCE_ANNOUNCE = 0,
     RESOURCE_REQUEST = 1,
     RESOURCE_DATA = 2
 };

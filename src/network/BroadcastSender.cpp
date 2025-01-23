@@ -44,7 +44,7 @@ void setup_broadcast_socket(int &sock) {
     int broadcast = 1;
     if (setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &broadcast,
                    sizeof(broadcast)) < 0) {
-        perror("failed at boradcast setsockopt");
+        perror("failed at broadcast setsockopt");
         exit(1);
     }
 }
@@ -52,7 +52,7 @@ void setup_broadcast_socket(int &sock) {
 void broadcast(int sock, struct sockaddr_in &broadcast_addr,
                const ResourceAnnounceMessage &msg) {
     spdlog::info(
-        "Broadcasting message of type RESOURCE_ANNOUCE with {} resources",
+        "Broadcasting message of type RESOURCE_ANNOUNCE with {} resources",
         msg.resourceNames.size());
 
     auto bytes = msg.serialize();
