@@ -1,5 +1,6 @@
 #include "Cli.h"
 #include <iostream>
+#include <string>
 #include <sstream>
 #include <vector>
 #include <algorithm>
@@ -96,14 +97,26 @@ void CLI::handleListPeerResources() {
 }
 
 void CLI::handleFind(const std::string &filename) {
-    std::cout << "Broadcasted request for file: '" << filename << "'\n";
-    // TODO: Implement actual network broadcast
+    std::vector<std::string> resourceHosts = peerResourceMap.getResourceHosts(filename);
+    
+    std::cout << std::endl;
+
+    if (resourceHosts.empty()) {
+        std::cout << "No hosts have the file '" << filename << "'\n";
+    } else {
+        int hostIndex = 1;
+        std::cout << "The file '" << filename << "' is available from the following hosts:\n";
+        for (const auto &host : resourceHosts) {
+            std::cout << hostIndex << ") "<< host << "\n";
+            ++hostIndex;
+        }
+    }
+    
 }
 
 void CLI::handleDownload(const std::string &hostIp, const std::string &filename) {
     std::cout << "Downloading '" << filename 
                   << "' from host: " << hostIp << "\n";
-    // TODO: Implement actual file download
 }
 
 void CLI::handleChangeResourceFolder(const std::string &newFolderPath) {
