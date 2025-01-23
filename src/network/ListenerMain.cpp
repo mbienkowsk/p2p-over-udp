@@ -10,7 +10,9 @@ int main() {
     auto localResourceManager =
         std::make_shared<LocalResourceManager>("../host_resources");
 
-    UdpListener listener(port, localResourceManager);
+    auto peerResourceMap = std::make_shared<PeerResourceMap>();
+
+    UdpListener listener(port, localResourceManager, peerResourceMap);
 
     listener.start();
 

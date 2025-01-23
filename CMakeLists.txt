@@ -42,8 +42,8 @@ set(SOURCES
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-# add_executable(UDP_LISTENER ${SOURCE_DIR}/network/ListenerMain.cpp)
-# target_link_libraries(UDP_LISTENER network_lib spdlog::spdlog)
+add_executable(UDP_LISTENER ${SOURCE_DIR}/network/ListenerMain.cpp)
+target_link_libraries(UDP_LISTENER network_lib spdlog::spdlog)
 
 # add_executable(UDP_SENDER ${SOURCE_DIR}/network/SenderMain.cpp)
 # target_link_libraries(UDP_SENDER network_lib)

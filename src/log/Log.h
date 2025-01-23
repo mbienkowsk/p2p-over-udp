@@ -22,11 +22,11 @@ inline void setup_logger(bool log_to_file, std::string filename) {
             std::make_shared<spdlog::logger>("console_logger", console_sink));
     }
 
-    spdlog::set_level(spdlog::level::info);
+    spdlog::set_level(spdlog::level::trace);
     spdlog::info("Logger initialized");
     spdlog::set_pattern("[%Y-%m-%d %H:%M:%S] [%l] %v");
 
-    spdlog::flush_on(spdlog::level::info);
+    spdlog::flush_on(spdlog::level::trace);
 }
 
 #endif // LOG_H
