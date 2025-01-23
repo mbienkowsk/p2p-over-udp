@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  node1:
+    build: .
+    container_name: node1
+    networks:
+      p2p_network:
+        ipv4_address: 172.22.0.2
+    tty: true
+    stdin_open: true
+    command: /bin/bash
+
+  node2:
+    build: .
+    container_name: node2
+    networks:
+      p2p_network:
+        ipv4_address: 172.22.0.3
+    tty: true
+    stdin_open: true
+    command: /bin/bash
+
+networks:
+  p2p_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/24

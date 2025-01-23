@@ -33,4 +33,4 @@ COPY . .
 RUN mkdir -p out
 WORKDIR /app/out
 
-ENTRYPOINT ["just"]
+CMD [ "just", "build" ]
