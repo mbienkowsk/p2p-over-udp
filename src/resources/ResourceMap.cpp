@@ -47,3 +47,14 @@ std::string ResourceMap::join(const std::vector<std::string>& vec, const std::st
     }
     return result;
 }
+
+std::ostream& operator<<(std::ostream& os, const std::map<std::string, std::vector<std::string>> &resourceMap) {
+    for (const auto& pair : resourceMap) {
+        os << pair.first << ": ";
+        for (const auto& resource : pair.second) {
+            os << resource << " ";
+        }
+        os << std::endl; 
+    }
+    return os;
+}

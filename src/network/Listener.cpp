@@ -29,6 +29,7 @@ void UdpListener::listen() {
   char buffer[MAX_MSG_SIZE];
 
   while (true) {
+    std::cout << "Current resource map:\n" << resourceMap.getAllResources() << std::endl;
     auto receivedPacket = tryRecv(buffer);
     if (receivedPacket.nBytes < 0) {
       // already logged it
@@ -53,7 +54,6 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
   if (auto *resourceAnnounce =
           dynamic_cast<ResourceAnnounceMessage *>(message.get())) {
     std::cout << *resourceAnnounce << std::endl;
-    // TODO: updated the list of available resources
     resourceMap.updateResources(senderIp, resourceAnnounce->resourceNames);
   } else if (auto *resourceRequest =
                  dynamic_cast<ResourceRequestMessage *>(message.get())) {

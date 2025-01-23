@@ -21,4 +21,7 @@ class ResourceMap{
         
         std::string join(const std::vector<std::string>& vec, const std::string& delimiter);
 };
+
+std::ostream& operator<<(std::ostream& os, const std::map<std::string, std::vector<std::string>> &resourceMap);
+
 #endif
