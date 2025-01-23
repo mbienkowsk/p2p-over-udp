@@ -64,6 +64,9 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
         std::cout << *resourceAnnounce << std::endl;
         peerResourceMap->updateResources(senderIp,
                                          resourceAnnounce->resourceNames);
+        // Log
+        spdlog::info("Updated resources for {}: {}", senderIp,
+                     fmt::join(resourceAnnounce->resourceNames, ", "));
     } else if (auto *resourceRequest =
                    dynamic_cast<ResourceRequestMessage *>(message.get())) {
         std::cout << *resourceRequest << std::endl;

@@ -29,6 +29,13 @@ int main(int argc, char *argv[]) {
 
     const int LISTENER_PORT = std::stoi(argv[1]);
 
+    // If the second argument exits set logfile to it
+    if (argc > 2) {
+        setup_logger(true, argv[2]);
+    } else {
+        setup_logger(false);
+    }
+
     setup_logger(true);
 
     auto b = BroadcastSender(PORT, BROADCAST_ADDR);
