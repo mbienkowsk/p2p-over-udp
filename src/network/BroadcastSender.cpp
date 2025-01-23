@@ -26,8 +26,9 @@ BroadcastSender::BroadcastSender(int port,
 
 std::thread BroadcastSender::make_worker(SABool stop,
                                          SRManager resourceManager) {
+
     return std::thread([this, stop, resourceManager]() {
-        while (!stop) {
+        while (!*stop) {
             auto msg =
                 ResourceAnnounceMessage(resourceManager->listResources());
             broadcast(sock_, *broadcast_addr_, msg);
