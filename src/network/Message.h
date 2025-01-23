@@ -37,7 +37,7 @@ class ResourceAnnounceMessage : public Message {
   /// Shorthand for creating the message with the default protocol
   /// version for testing
   ResourceAnnounceMessage(std::vector<std::string> resourceNames)
-      : Message(MessageType::RESOURCE_ANNOUCE), resourceNames(resourceNames){};
+      : Message(MessageType::RESOURCE_ANNOUNCE), resourceNames(resourceNames){};
 
     /// Serializes the message into a vector of bytes in the format:
     /// header, resource names with null separators between the resource names

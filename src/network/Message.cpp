@@ -21,7 +21,7 @@ Message::from_bytes(const std::vector<std::byte> &raw_data) {
     std::memcpy(payload.data(), &raw_data[Header::SIZE], payload.size());
 
     switch (header.messageType) {
-    case MessageType::RESOURCE_ANNOUCE:
+    case MessageType::RESOURCE_ANNOUNCE:
         return std::make_unique<ResourceAnnounceMessage>(
             ResourceAnnounceMessage::fromHeaderAndPayload(header, payload));
 
