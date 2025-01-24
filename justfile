@@ -3,6 +3,15 @@ set working-directory := 'out'
 default:
   @just --list
 
+run_default:
+  just run /app/host_resources p2p.log
+
+run_1:
+  just run /app/host1_resources p2p.log
+
+run_2:
+  just run /app/host2_resources p2p.log
+
 # Build the test executable
 build_tests:
   cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=./Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_STANDARD=20 ..
@@ -14,8 +23,8 @@ build:
   make PSI_projekt
 
 # Build and run the main executable listening on the given port, logging to the given file
-run port logfile: build
-  ./Debug/PSI_projekt {{port}} {{logfile}}
+run directory logfile: build
+  ./Debug/PSI_projekt {{directory}} {{logfile}}
 
 # Build and run unit tests
 test: build_tests
