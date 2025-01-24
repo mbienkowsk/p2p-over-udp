@@ -57,16 +57,6 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 #     -fsanitize=leak
 # )
 
-# Link boost
-find_package(Boost 1.71.0 COMPONENTS filesystem system REQUIRED)
-
-# Include Boost headers
-if(Boost_FOUND)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${Boost_LIBRARIES})
-else()
-    message(FATAL_ERROR "Boost not found")
-endif()
 
 # Link spdlog
 find_package(spdlog REQUIRED)

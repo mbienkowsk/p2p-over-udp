@@ -14,7 +14,6 @@ RUN apt-get update && apt-get install -y \
     curl \
     libssl-dev \
     pkg-config \
-    libboost-all-dev \
     libspdlog-dev \
     git \
     netcat \

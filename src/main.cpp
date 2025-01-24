@@ -7,8 +7,6 @@
 #include "spdlog/spdlog.h"
 #include <arpa/inet.h>
 #include <atomic>
-#include <boost/asio/io_context.hpp>
-#include <boost/asio/post.hpp>
 #include <cstring>
 #include <filesystem>
 #include <ifaddrs.h>
@@ -17,7 +15,6 @@
 #include <netinet/in.h>
 #include <string>
 #include <sys/types.h>
-#include <system_error>
 #include <thread>
 #include <unistd.h>
 
