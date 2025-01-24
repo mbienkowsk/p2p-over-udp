@@ -16,14 +16,12 @@ CLI::CLI(std::shared_ptr<LocalResourceManager> resourceManager,
     : localResourceManager(resourceManager), peerResourceMap(resourceMap) {};
 
 void CLI::run() {
-    const std::string HELP_STRING =
-        "Available commands:\n"
-        "  list-resources\n"
-        "  find <filename>\n"
-        "  download <host-ip> <filename>\n"
-        "  change-resource-folder <new-folder-path>\n"
-        "  help\n"
-        "  exit\n\n";
+    const std::string HELP_STRING = "Available commands:\n"
+                                    "  list-resources\n"
+                                    "  find <filename>\n"
+                                    "  download <host-ip> <filename>\n"
+                                    "  help\n"
+                                    "  exit\n\n";
 
     std::cout << "Welcome to the P2P File Sharing CLI!\n";
     std::cout << HELP_STRING;
@@ -73,13 +71,6 @@ void CLI::run() {
                 std::cerr << "Usage: download <host-ip> <filename>\n";
             } else {
                 handleDownload(tokens[1], tokens[2]);
-            }
-        } else if (cmd == "change-resource-folder") {
-            if (tokens.size() < 2) {
-                std::cerr
-                    << "Usage: change-resource-folder <new-folder-path>\n";
-            } else {
-                handleChangeResourceFolder(tokens[1]);
             }
         } else if (cmd == "help") {
             std::cout << HELP_STRING;
@@ -131,15 +122,4 @@ void CLI::handleDownload(const std::string &hostIp,
     auto res = downloader->start();
     if (res)
         std::cout << "Downloading '" << filename << "' from " << hostIp << "\n";
-}
-
-void CLI::handleChangeResourceFolder(const std::string &newFolderPath) {
-    if (localResourceManager->setResourceFolder(newFolderPath)) {
-        std::cout << "Resource folder changed to: " << newFolderPath << "\n";
-    } else {
-        std::cerr << "Failed to change resource folder to: " << newFolderPath
-                  << "\n"
-                  << "Please check if the folder exists.\n"
-                  << OOB_CODE << PROMPT << std::flush;
-    }
 }
