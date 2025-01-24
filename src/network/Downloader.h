@@ -42,10 +42,8 @@ class Downloader : public std::enable_shared_from_this<Downloader> {
 
     std::optional<std::string> errorReason;
 
-    // TODO: pass in a callback to call after downloading - display success/fail
     // via the cli, now it's silent
     bool start();
-    // TODO: this doesn't seem to impact a running downloader(?) investigate
     void stop();
 
   private:

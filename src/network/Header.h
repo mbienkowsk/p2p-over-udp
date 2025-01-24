@@ -25,7 +25,6 @@ class Header {
 
     /// Type of the message (announce/request/data)
     MessageType messageType;
-    // uint32_t dataSize; TODO: do we need this?
 
     /// Serializes the header into a vector of bytes
     std::vector<std::byte> serialize() const;

@@ -13,7 +13,7 @@
 
 CLI::CLI(std::shared_ptr<LocalResourceManager> resourceManager,
          std::shared_ptr<PeerResourceMap> resourceMap)
-    : localResourceManager(resourceManager), peerResourceMap(resourceMap) {};
+    : localResourceManager(resourceManager), peerResourceMap(resourceMap){};
 
 void CLI::run() {
     const std::string HELP_STRING = "Available commands:\n"
