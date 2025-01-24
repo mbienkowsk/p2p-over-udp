@@ -21,35 +21,35 @@ bool Downloader::start() {
 
     Downloader::runningDownloads[msg->resource_name] = shared_from_this();
 
-    std::thread worker([this]() {
+    auto stopFlag = this->stopFlag;
+    auto sender = std::move(this->sender);
+    auto msg = std::move(this->msg);
+
+    std::thread worker([stopFlag, sender = std::move(sender),
+                        msg = std::move(msg)]() {
         size_t retry = 0;
-        while (!this->stopFlag) {
+        while (!*stopFlag) {
             if (retry >= 5) {
                 spdlog::error(
                     "Couldn't download: '{}', after {} retries. Aborting.",
-                    this->msg->resource_name, retry);
-                // TODO: failing to download resource due to unavailable host
-                // segfaults on exit
-                this->stopFlag = true;
-                this->errorReason = "Failed to send message after 5 retries";
-                return;
+                    msg->resource_name, retry);
+                *stopFlag = true;
+                break;
             }
             if (retry > 0) {
                 spdlog::info("Couldn't download: '{}', done {} retries.",
-                             this->msg->resource_name, retry);
+                             msg->resource_name, retry);
             }
             try {
                 sender->sendMessage(*msg);
             } catch (const std::exception &ex) {
-                this->errorReason = ex.what();
-                this->stopFlag = true;
-                spdlog::error(
-                    "An error occured when downloading resource '{}': {}",
-                    this->msg->resource_name, this->errorReason.value());
-                return;
+                *stopFlag = true;
+                spdlog::error("An error occured when downloading resource '{}'",
+                              msg->resource_name);
+                break;
             }
             retry++;
-            if (this->stopFlag) {
+            if (*stopFlag) {
                 break;
             }
             std::this_thread::sleep_for(std::chrono::seconds(3));
@@ -63,6 +63,6 @@ bool Downloader::start() {
 }
 
 void Downloader::stop() {
-    stopFlag = true;
+    *stopFlag = true;
     spdlog::trace("stop called");
 }

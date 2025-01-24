@@ -49,11 +49,12 @@ class Downloader : public std::enable_shared_from_this<Downloader> {
   private:
     Downloader(std::unique_ptr<UdpSender> sender,
                std::unique_ptr<ResourceRequestMessage> msg)
-        : sender(std::move(sender)), msg(std::move(msg)), stopFlag(false) {};
+        : sender(std::move(sender)), msg(std::move(msg)){};
 
+    std::shared_ptr<std::atomic_bool> stopFlag =
+        std::make_shared<std::atomic_bool>(false);
     std::unique_ptr<UdpSender> sender;
     std::unique_ptr<ResourceRequestMessage> msg;
-    std::atomic_bool stopFlag;
 };
 
 #endif // DOWNLOADER_H
