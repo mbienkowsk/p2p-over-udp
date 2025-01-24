@@ -25,7 +25,7 @@
 
 - Dodawanie nowych zasobów przez użytkownika – wprowadzanie z lokalnego systemu plików.
 - Pobieranie zasobów:
-  - Użytkownik może pobrać konkretny zasób po nazwie ze zdalnego hosta (jeden zasób na raz).
+  - Użytkownik może pobrać konkretny zasób po nazwie ze zdalnego hosta (jeden zasóbna raz).
   - Użytkownik decyduje, z którego hosta dany zasób zostanie pobrany.
 - Rozgłaszanie informacji o posiadanych lokalnie zasobach.
 
@@ -507,6 +507,42 @@ Interfejs CLI zapewnia obsługę błędów i podpowiedzi, gdy użytkownik wprowa
 ### **4. Wyjście z aplikacji**
 
 Aby zamknąć aplikację, użytkownik może wpisać komendę `exit`. Aplikacja wyświetla komunikat i kończy działanie.
+
+## Postać wszystkich plików konfiguracyjnych, logów, itp
+
+### W projekcie tworzenie obrazów jest skonfigurowane w **Dockerfile**  
+
+- instalowanie pakietów:
+  - narzędzia, pakiety itd.
+- przygotowanie środowiska:
+  - katalog roboczy
+- ustawianie *just* jako komendy startowej
+
+### Do kompilacji i budowania skonfigurowany jest plik **CMakeLists.txt**
+
+- wymagania minimalne
+- standard C++
+- katalogi z kodem źródłowym
+- pliki źródłowe
+- biblioteki
+- testy
+
+### Żeby uruchamiać kontenery naraz skonfigurowany jest plik **docker-compose.yaml**
+
+- daje możliwość uruchamiania kontenerów jednocześnie
+- skonfigurowane są w nim trzy targety: client1/2/3 używane do testów programu
+  - budowane są na podstawie tego samego obrazu
+- podłączane są do tej samej sieci *Docker network*, żeby mogły się komunikować
+
+### Logi realizujemy przy użyciu biblioteki **spdlog**  
+
+- używany jest do wypisywania komunikatów o działaniach programu, wysłanych i odebranych wiadomościach itp.
+- wypisuje informacje, ostrzeżenia, błędy
+- użyty jest Logger (*Log.h*)
+  - w zależności od użycia:
+    - loguje na konsolę
+    - zapisuje logi do pliku
+- ma ustawiony poziom logowania na *trace*, w domyślnym ustawieniu logi trafiają do pliku
 
 ## Narzędzia
 
