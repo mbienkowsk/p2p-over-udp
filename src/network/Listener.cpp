@@ -75,17 +75,21 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
         return;
     }
 
-    if (auto *resourceAnnounce =
-            dynamic_cast<ResourceAnnounceMessage *>(message.get())) {
+    auto resource = message.get();
+    switch (resource->header.messageType) {
+    case MessageType::RESOURCE_ANNOUNCE: {
+        auto resourceAnnounce =
+            dynamic_cast<ResourceAnnounceMessage *>(message.get());
         peerResourceMap->updateResources(senderIp,
                                          resourceAnnounce->resourceNames);
         // Log
         spdlog::info("Updated resources for {}: {}", senderIp,
                      fmt::join(resourceAnnounce->resourceNames, ", "));
-
-    } else if (auto *resourceRequest =
-                   dynamic_cast<ResourceRequestMessage *>(message.get())) {
-
+        break;
+    }
+    case MessageType::RESOURCE_REQUEST: {
+        auto resourceRequest =
+            dynamic_cast<ResourceRequestMessage *>(message.get());
         spdlog::info("Received resource request for: {} from {}:{}",
                      resourceRequest->resource_name, senderIp, senderPort);
 
@@ -105,8 +109,10 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
         auto header = Header(MessageType::RESOURCE_DATA);
         sender.sendMessage(ResourceDataMessage(
             header, resourceRequest->resource_name, resourceData));
-    } else if (auto *resourceData =
-                   dynamic_cast<ResourceDataMessage *>(message.get())) {
+        break;
+    }
+    case MessageType::RESOURCE_DATA: {
+        auto resourceData = dynamic_cast<ResourceDataMessage *>(message.get());
         spdlog::info("Received resource data for: {}",
                      resourceData->resourceName);
 
@@ -139,8 +145,11 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
             spdlog::error("Failed to save resource '{}': {}",
                           resourceData->resourceName, ex.what());
         }
-    } else {
+        break;
+    }
+    default:
         std::cout << "Unknown Message Type" << std::endl;
+        break;
     }
 }
 
