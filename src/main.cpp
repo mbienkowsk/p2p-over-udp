@@ -10,15 +10,18 @@
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/post.hpp>
 #include <cstring>
+#include <filesystem>
 #include <ifaddrs.h>
 #include <iostream>
 #include <memory>
 #include <netinet/in.h>
+#include <string>
 #include <sys/types.h>
+#include <system_error>
 #include <thread>
 #include <unistd.h>
 
-#define RESOURCE_FOLDER "../host_resources"
+#define RESOURCE_FOLDER "./test"
 
 /// Cleanup function that waits for the subthreads to finish and logs
 /// the progress
@@ -43,15 +46,29 @@ void cleanup(std::thread &listenerThread, std::thread &broadcastThread,
     spdlog::info("Both subthreads finished, exiting the program");
 }
 
-// TODO: don't take in port, only the log file since the port is hardcoded to
-// 8000
-int handleArgs(int argc, char *argv[]) {
+std::string getAbsolutePath(const std::string &relative_path) {
+    try {
+        std::filesystem::path absolute_path =
+            std::filesystem::canonical(relative_path);
+        return absolute_path.string();
+    } catch (const std::filesystem::filesystem_error &e) {
+        std::cerr << "Couldn't access '" << relative_path << "' folder"
+                  << std::endl;
+        exit(1);
+    }
+}
+
+/*
+  Returns resource folder path from the command line arguments
+*/
+std::string handleArgs(int argc, char *argv[]) {
     if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <UDP Listen Port>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <Resource folder path>"
+                  << std::endl;
         exit(1);
     }
 
-    const int port = std::stoi(argv[1]);
+    std::string resourceFolder = getAbsolutePath(argv[1]);
 
     // If the second argument exits set logfile to it
     if (argc > 2) {
@@ -60,7 +77,7 @@ int handleArgs(int argc, char *argv[]) {
         setup_logger(false, "");
     }
 
-    return port;
+    return resourceFolder;
 }
 
 // TODO: this is helpful for debugging, but should be factored out to some
@@ -140,7 +157,8 @@ std::string getEth0Address() {
 }
 
 int main(int argc, char *argv[]) {
-    handleArgs(argc, argv);
+    std::string resourceFolder = handleArgs(argc, argv);
+    spdlog::info("Sharing resources from folder: {}", resourceFolder);
 
     auto address = getEth0Address();
     spdlog::info("Eth0 address: {}", address);
@@ -148,7 +166,7 @@ int main(int argc, char *argv[]) {
     // Initialize all components
     auto broadcastSender = BroadcastSender(PORT, BROADCAST_ADDR);
     auto localResourceManager =
-        std::make_shared<LocalResourceManager>(RESOURCE_FOLDER);
+        std::make_shared<LocalResourceManager>(resourceFolder);
     auto peerResourceMap = std::make_shared<PeerResourceMap>();
     auto listener =
         UdpListener(PORT, localResourceManager, peerResourceMap, address);
