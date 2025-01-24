@@ -5,6 +5,8 @@
 
 24.01.2024
 
+*Zmiany względem projektu wstępnego zostały umieszczone w oddzielnej sekcji pod jego treścią.*
+
 ## Projekt wstępny
 
 ## 1. Temat i treść zadania
@@ -320,4 +322,38 @@ przy pomocy testów ręczych i jednostkowych.
 
 ## Zmiany względem dokumentacji wstępnej
 
-### Struktura nagłówka wiadomości
+### Struktura wiadomości
+
+Z nagłówka zostało usunięte pole `DATA_SIZE`. Jako, że korzystamy z protokołu UDP i wszystkie wiadomości mieszczą się
+w jednym pakiecie, długość wiadomości obliczana jest na podstawie liczby odebranych bajtów i długości nagłówka:
+`MSG_SIZE = ALLTOGETHER_SIZE - HEADER_SIZE`. Pozwoliło nam to zmniejszyć rozmiar nagłówka do dwóch bajtów, dzięki
+czemu maksymalny rozmiar wysyłanego pliku to `65507 - HEADER_SIZE - FILENAME_SIZE - 1`, gdzie 1 odpowiedzialne jest za separatory między
+częściami wiadomości. Dla zasobu o jednoznakowej nazwie, maksymalny rozmiar pliku to `65507 - 2 - 1 = 65504` bajty.
+ <!--TODO: static size  -->
+
+### Konsekwencje nieudanego pobrania zasobu
+
+W dokumentacji początkowej uznaliśmy, że nieotrzymanie zasobu w odpowiedzi na prośbę skutkowało będzie usunięciem wszystkich
+zasobów użytkownika z bazy zasobów trzymanej w pamięci programu. Zamiast tego postanowiliśmy usunąć wyłącznie ten plik - nie zakładamy w ten sposób,
+że użytkownik stracił połączenie, a jedynie, że plik, który rozgłaszał, został usunięty/stracony.
+
+### Model wielowątkowy, struktura aplikacji
+
+Założenia dotyczące radzenia sobie z utratą pakietów, modelu architektury wielowątkowej i podziału na moduły okazały się słuszne. W strukturze
+plików został wydzielony jeszcze pakiet `serialization` zawierający pomocnicze funkcje - nie chcieliśmy przeładować plików
+związanych z wiadomościami funkcjami, które nie są ściśle związane z serializacją ich struktury.
+
+### Wykorzystane biblioteki
+
+Ostatecznie posłużyliśmy się obsługą wątków zawartą w bibliotece standardowej, w związku z czym biblioteka `Boost` okazała
+się zbędna.
+
+### Interfejs uzytkownika
+
+Interfejs użytkownika uległ kilku kosmetycznym zmianom w porównaniu do dokumentacji wstępnej, funkcjonalność pozostała taka sama.
+
+### Inne
+
+Zamiast `uint8_t` do przekazywania i serializacji wiadomości został użyty nowszy `std::byte`.
+
+Warte wspomnienia jest, że nazwy plików nie mogą zawierać znaków spoza zbioru ASCII ze względu na sposób deserializacji danych.
