@@ -5,6 +5,9 @@
 #include "../resources/PeerResourceMap.h"
 #include <memory>
 
+const std::string OOB_CODE = "\"\r\033[K";
+const std::string PROMPT = "> ";
+
 class CLI {
   public:
     CLI(std::shared_ptr<LocalResourceManager> resourceManager,

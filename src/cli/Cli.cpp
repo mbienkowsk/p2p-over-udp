@@ -29,7 +29,7 @@ void CLI::run() {
     std::cout << HELP_STRING;
 
     while (true) {
-        std::cout << "> ";
+        std::cout << PROMPT;
 
         // Read a line of input from the user
         std::string line;
@@ -120,12 +120,13 @@ void CLI::handleDownload(const std::string &hostIp,
         std::make_unique<ResourceRequestMessage>(
             Header(MessageType::RESOURCE_REQUEST), filename),
         [peerResourceMap = this->peerResourceMap, filename, hostIp]() {
-            std::cout << "Download failed: " << filename << std::endl << "> ";
+            std::cout << "Download failed: " << filename << std::endl;
             peerResourceMap->removeResourceFromPeer(hostIp, filename);
         },
         [peerResourceMap = this->peerResourceMap, filename, hostIp]() {
-            std::cout << "Download completed: " << filename << std::endl
-                      << "> ";
+            std::cout << OOB_CODE << "Download completed: " << filename
+                      << std::endl
+                      << OOB_CODE << PROMPT << std::flush;
         });
     auto res = downloader->start();
     if (res)
@@ -138,6 +139,7 @@ void CLI::handleChangeResourceFolder(const std::string &newFolderPath) {
     } else {
         std::cerr << "Failed to change resource folder to: " << newFolderPath
                   << "\n"
-                  << "Please check if the folder exists.\n";
+                  << "Please check if the folder exists.\n"
+                  << OOB_CODE << PROMPT << std::flush;
     }
 }
