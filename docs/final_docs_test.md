@@ -12,7 +12,7 @@ Poniżej przedstawiono scenariusze testowe, oraz otrzymane rezultaty.
 **Oczekiwana odpowiedź (sukces):**
 ```
    Listing resources available for download:
-   
+
    file1.txt
    [192.168.1.2, 192.168.1.3]
 
@@ -127,7 +127,9 @@ No hosts have the file 'non-existing-file.txt'
 
 **Odpowiedź aplikacji:**
 ```
-?????
+> download 192.168.1.100 example.txt
+Downloading 'example.txt' from 192.168.1.100
+> Download failed: example.txt
 ```
 
 ---
@@ -139,7 +141,9 @@ No hosts have the file 'non-existing-file.txt'
 
 **Odpowiedź aplikacji:**
 ```
-????
+> download 172.22.0.3 non-existing-file.txt
+Downloading 'non-existing-file.txt' from 172.22.0.3
+> Download failed: non-existing-file.txt
 ```
 
 ---
