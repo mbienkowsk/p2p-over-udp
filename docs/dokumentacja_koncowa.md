@@ -357,3 +357,10 @@ Interfejs użytkownika uległ kilku kosmetycznym zmianom w porównaniu do dokume
 Zamiast `uint8_t` do przekazywania i serializacji wiadomości został użyty nowszy `std::byte`.
 
 Warte wspomnienia jest, że nazwy plików nie mogą zawierać znaków spoza zbioru ASCII ze względu na sposób deserializacji danych.
+
+## Narzędzia
+
+Zgodnie z dokumentacją wstępną, użyliśmy CMake do zbudowania projektu. Użyliśmy także `clang_tidy` i `clang_format` ze współdzieloną konfiguracją trzymaną w repozytorium.
+Testowanie projektu przeprowadzaliśmy początkowo na maszynie lokalnej, następnie w sieci dockerowej. Do zagregowania często używanych komend - budowania, formatowania, lintowania, uruchamiania
+testów oraz wynikowych plików binarnych użyliśmy narzędzia [just](https://github.com/casey/just), które jest nowoczesnym zamiennikiem `make`. Justfile zawiera także instrukcje
+do uruchomienia aplikacji z predefiniowanymi parametrami dla określonych użytkowników sieci projektowej.
