@@ -358,6 +358,46 @@ Zamiast `uint8_t` do przekazywania i serializacji wiadomości został użyty now
 
 Warte wspomnienia jest, że nazwy plików nie mogą zawierać znaków spoza zbioru ASCII ze względu na sposób deserializacji danych.
 
+## Opis najważniejszych rozwiązań funkcjonalnych wraz z uzasadnieniem
+
+W architekturze programu można wyróżnić 5 główne komponenty:
+
+### CLI - interfejs linii poleceń
+
+Pozwala na interakcję użytkownika ze wszystkimi funkcjami programu:
+
+- pobieranie pliku
+- wyświetlanie dostępnych plików i hostów je posiadających
+- znalezienie hosta posiadającego dany plik
+
+CLI jest uruchamiane w głównym wątku programu i zakończenie go kończy działanie programu.
+
+### Rozgłaszacz broadcast
+
+Komponent uruchomiony w osobnym wątku, który cyklicznie rozgłasza informacje o dostępnych plikach.
+
+### Serwer
+
+Komponent uruchomiony w osobnym wątku, który nasłuchuje na przychodzące pakiety i wykonuje wymagane nie blokując zadania np. zapisuje plik na dysku oraz zleca zadania innym komponentom.
+
+### Moduł pobierania plików
+
+Komponent przechowujący strukturę danych zawierającą wątki pobierające pliki.
+
+Do zlecenia pobrania pliku przypisywany jest nowy wątek (identyfikowany po nazwie pliku), który do 5 razy próbuje pobrać plik od innego klienta. Wątek jest i usuwany z hash mapy i ewentualnie zabijany po udanej lub nieuadanej próbie pobrania pliku.
+Tak zaprojektowane wielowątkowe rozwiązanie pozwala na pobieranie wielu plików jednocześnie bez blokowania innych operacji.
+
+Sekcja krytyczna zabezpieczona jest mutexem, który zapewnia, że dostęp do hash mapy i tworzenie nowych zleceń pobrania pliku jest bezpieczne w środowisku wielowątkowym.
+Do komunikacji z wątkami odpowiedzialnymi za pobieranie zasobów (w przypadku otrzymania zasobu lub polecenia wyjścia z CLI) użyte są warunki stopu w postaci `std::atomic_int`.
+
+### Moduł zarządzania plikami
+
+Komponent przechowujący listę plików dostępnych do pobrania od każdego połączonego klienta. Jest to hash mapa z kluczami będącymi IP innych użytkowników i listami plików dostępnych od nich do pobrania jako wartościami.
+
+Moduł ten pozwala na aktualizaowanie listy plików dostępnych do pobrania oraz rozgłoszania.
+
+Sekcja krytyczna zabezpieczona jest mutexem, który zapewnia stabilne działanie komponentu nawet w gdy jednocześnie wiele użytkowników powoduje zmiany w liście plików dostępnych do pobrania.
+
 ## Narzędzia
 
 Zgodnie z dokumentacją wstępną, użyliśmy CMake do zbudowania projektu. Użyliśmy także `clang_tidy` i `clang_format` ze współdzieloną konfiguracją trzymaną w repozytorium.
