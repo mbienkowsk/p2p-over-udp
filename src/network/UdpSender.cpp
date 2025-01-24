@@ -25,7 +25,9 @@ void UdpSender::sendMessage(const Message &message) const {
                (struct sockaddr *)&dest_addr, sizeof(dest_addr));
 
     if (sentBytes < 0) {
-        throw std::runtime_error("Failed to send message");
+        throw std::runtime_error("Failed to send message. Tried to send " +
+                                 std::to_string(serializedMessage.size()) +
+                                 " bytes");
     }
 
     if (static_cast<size_t>(sentBytes) != serializedMessage.size()) {
