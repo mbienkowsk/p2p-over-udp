@@ -4,3 +4,5 @@ compile_commands.json
 .cache
 build
 host_resources
+host1_resources/l
+host1_resources/s
