@@ -1,6 +1,7 @@
 #include "cli/Cli.h"
 #include "log/Log.h"
 #include "network/BroadcastSender.h"
+#include "network/Downloader.h"
 #include "network/Listener.h"
 #include "network/constants.h"
 #include "serialization/Utils.h"
@@ -20,8 +21,6 @@
 #include <system_error>
 #include <thread>
 #include <unistd.h>
-
-#define RESOURCE_FOLDER "./test"
 
 /// Cleanup function that waits for the subthreads to finish and logs
 /// the progress
@@ -186,6 +185,7 @@ int main(int argc, char *argv[]) {
     auto cli = CLI(localResourceManager, peerResourceMap);
     cli.run();
 
+    Downloader::runningDownloads.clear();
     cleanup(listenerThread, broadcastThread, listenerStop, broadcastStop);
     return 0;
 }

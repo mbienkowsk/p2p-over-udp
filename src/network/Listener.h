@@ -37,7 +37,7 @@ class UdpListener {
         uint16_t senderPort;
     };
 
-    static const int MAX_MSG_SIZE = 65505;
+    static const int MAX_MSG_SIZE = 65507;
 
     std::shared_ptr<PeerResourceMap> peerResourceMap;
     std::shared_ptr<LocalResourceManager> localResourceManager;

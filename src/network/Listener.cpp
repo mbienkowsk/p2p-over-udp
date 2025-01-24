@@ -89,6 +89,13 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
         spdlog::info("Received resource request for: {} from {}:{}",
                      resourceRequest->resource_name, senderIp, senderPort);
 
+        if (!localResourceManager->resourceExists(
+                resourceRequest->resource_name)) {
+            spdlog::warn("Resource not found: {}",
+                         resourceRequest->resource_name);
+            return;
+        }
+
         std::vector<std::byte> resourceData =
             localResourceManager->getResource(resourceRequest->resource_name);
 
