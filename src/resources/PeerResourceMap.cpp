@@ -22,6 +22,24 @@ PeerResourceMap::getPeerResources(const std::string &peerIP) {
     return {};
 }
 
+bool PeerResourceMap::removeResourceFromPeer(const std::string &peerIP,
+                                             const std::string &resource) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (resourceMap_.find(peerIP) != resourceMap_.end()) {
+        auto &resources = resourceMap_[peerIP];
+        auto it = std::find(resources.begin(), resources.end(), resource);
+        if (it != resources.end()) {
+            resources.erase(it);
+            spdlog::info("Removed resource {} from peer {}", resource, peerIP);
+            return true;
+        }
+        spdlog::warn("Resource {} not found for peer {}", resource, peerIP);
+        return false;
+    }
+    spdlog::warn("Peer {} not found", peerIP);
+    return false;
+}
+
 std::vector<std::string>
 PeerResourceMap::getResourceHosts(const std::string &searchedResource) {
     std::lock_guard<std::mutex> lock(mutex_);

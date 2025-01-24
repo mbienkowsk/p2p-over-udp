@@ -13,6 +13,8 @@ class PeerResourceMap {
     std::vector<std::string> getPeerResources(const std::string &peerIP);
     std::vector<std::string> getResourceHosts(const std::string &resource);
     std::map<std::string, std::vector<std::string>> getAllResources();
+    bool removeResourceFromPeer(const std::string &peerIP,
+                                const std::string &resource);
 
   private:
     std::map<std::string, std::vector<std::string>> resourceMap_;

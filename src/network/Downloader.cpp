@@ -21,19 +21,19 @@ bool Downloader::start() {
 
     Downloader::runningDownloads[msg->resource_name] = shared_from_this();
 
-    auto stopFlag = this->stopFlag;
-    auto sender = std::move(this->sender);
-    auto msg = std::move(this->msg);
-
-    std::thread worker([stopFlag, sender = std::move(sender),
-                        msg = std::move(msg)]() {
+    std::thread worker([stopFlag = this->stopFlag,
+                        sender = std::move(this->sender),
+                        msg = std::move(this->msg), onSuccess = this->onSuccess,
+                        onFailure = this->onFailure]() {
         size_t retry = 0;
+        bool success = true;
         while (!*stopFlag) {
             if (retry >= 5) {
                 spdlog::error(
                     "Couldn't download: '{}', after {} retries. Aborting.",
                     msg->resource_name, retry);
                 *stopFlag = true;
+                success = false;
                 break;
             }
             if (retry > 0) {
@@ -46,6 +46,7 @@ bool Downloader::start() {
                 *stopFlag = true;
                 spdlog::error("An error occured when downloading resource '{}'",
                               msg->resource_name);
+                success = false;
                 break;
             }
             retry++;
@@ -53,6 +54,13 @@ bool Downloader::start() {
                 break;
             }
             std::this_thread::sleep_for(std::chrono::seconds(3));
+        }
+        if (success) {
+            spdlog::trace("Calling Downloader onSuccess()");
+            onSuccess();
+        } else {
+            spdlog::trace("Calling Downloader onFailure()");
+            onFailure();
         }
         spdlog::trace("Exiting thread");
         Downloader::runningDownloads.erase(msg->resource_name);

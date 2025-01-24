@@ -26,11 +26,13 @@ class Downloader : public std::enable_shared_from_this<Downloader> {
         return runningDownloads[resourceName];
     }
 
-    static std::shared_ptr<Downloader>
-    create(std::unique_ptr<UdpSender> sender,
-           std::unique_ptr<ResourceRequestMessage> msg) {
-        return std::shared_ptr<Downloader>(
-            new Downloader(std::move(sender), std::move(msg)));
+    static std::shared_ptr<Downloader> create(
+        std::unique_ptr<UdpSender> sender,
+        std::unique_ptr<ResourceRequestMessage> msg,
+        std::function<void()> onFailure = []() {},
+        std::function<void()> onSuccess = []() {}) {
+        return std::shared_ptr<Downloader>(new Downloader(
+            std::move(sender), std::move(msg), onFailure, onSuccess));
     }
 
     ~Downloader() {
@@ -47,14 +49,20 @@ class Downloader : public std::enable_shared_from_this<Downloader> {
     void stop();
 
   private:
-    Downloader(std::unique_ptr<UdpSender> sender,
-               std::unique_ptr<ResourceRequestMessage> msg)
-        : sender(std::move(sender)), msg(std::move(msg)){};
+    Downloader(
+        std::unique_ptr<UdpSender> sender,
+        std::unique_ptr<ResourceRequestMessage> msg,
+        std::function<void()> onFailure = []() {},
+        std::function<void()> onSuccess = []() {})
+        : sender(std::move(sender)), msg(std::move(msg)), onFailure(onFailure),
+          onSuccess(onSuccess){};
 
     std::shared_ptr<std::atomic_bool> stopFlag =
         std::make_shared<std::atomic_bool>(false);
     std::unique_ptr<UdpSender> sender;
     std::unique_ptr<ResourceRequestMessage> msg;
+    std::function<void()> onFailure;
+    std::function<void()> onSuccess;
 };
 
 #endif // DOWNLOADER_H

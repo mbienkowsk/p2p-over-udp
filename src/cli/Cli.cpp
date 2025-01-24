@@ -13,7 +13,7 @@
 
 CLI::CLI(std::shared_ptr<LocalResourceManager> resourceManager,
          std::shared_ptr<PeerResourceMap> resourceMap)
-    : localResourceManager(resourceManager), peerResourceMap(resourceMap){};
+    : localResourceManager(resourceManager), peerResourceMap(resourceMap) {};
 
 void CLI::run() {
     const std::string HELP_STRING =
@@ -118,7 +118,15 @@ void CLI::handleDownload(const std::string &hostIp,
     auto downloader = Downloader::create(
         std::make_unique<UdpSender>(hostIp, PORT),
         std::make_unique<ResourceRequestMessage>(
-            Header(MessageType::RESOURCE_REQUEST), filename));
+            Header(MessageType::RESOURCE_REQUEST), filename),
+        [peerResourceMap = this->peerResourceMap, filename, hostIp]() {
+            std::cout << "Download failed: " << filename << std::endl << "> ";
+            peerResourceMap->removeResourceFromPeer(hostIp, filename);
+        },
+        [peerResourceMap = this->peerResourceMap, filename, hostIp]() {
+            std::cout << "Download completed: " << filename << std::endl
+                      << "> ";
+        });
     auto res = downloader->start();
     if (res)
         std::cout << "Downloading '" << filename << "' from " << hostIp << "\n";
