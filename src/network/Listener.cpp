@@ -95,9 +95,9 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
         UdpSender sender(senderIp, PORT);
         spdlog::trace("Sending resource data for: {}",
                       resourceRequest->resource_name);
-        sender.sendMessage(ResourceDataMessage(resourceRequest->header,
-                                               resourceRequest->resource_name,
-                                               resourceData));
+        auto header = Header(MessageType::RESOURCE_DATA);
+        sender.sendMessage(ResourceDataMessage(
+            header, resourceRequest->resource_name, resourceData));
     } else if (auto *resourceData =
                    dynamic_cast<ResourceDataMessage *>(message.get())) {
         spdlog::info("Received resource data for: {}",
