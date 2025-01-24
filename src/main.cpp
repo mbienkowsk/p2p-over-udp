@@ -76,7 +76,6 @@ std::string handleArgs(int argc, char *argv[]) {
     return resourceFolder;
 }
 
-// TODO: this is helpful for debugging, but should be factored out to some
 // helper instead of hogging main
 void listIPAddresses() {
     struct ifaddrs *ifAddrStruct = nullptr;
@@ -108,7 +107,6 @@ void listIPAddresses() {
     }
 }
 
-// TODO: same as listIPAddresses, move this somewhere
 std::string getEth0Address() {
     struct ifaddrs *ifAddrStruct = nullptr;
     struct ifaddrs *ifa = nullptr;

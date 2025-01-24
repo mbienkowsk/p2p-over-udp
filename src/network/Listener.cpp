@@ -48,7 +48,6 @@ void UdpListener::listen(SABool stop) {
             continue;
         }
 
-        // TODO: operate on char arrays in Message::from_bytes instead to avoid
         // copying this
         std::vector<std::byte> rawData(receivedPacket.nBytes);
         std::memcpy(rawData.data(), buffer, receivedPacket.nBytes);
@@ -69,7 +68,6 @@ void UdpListener::handleMessage(std::unique_ptr<Message> message,
                                 const std::string &senderIp,
                                 const uint16_t &senderPort) {
 
-    // TODO: factor out to separate methods
     if (senderIp == myAddress) {
         spdlog::trace("Ignoring message from self");
         return;
