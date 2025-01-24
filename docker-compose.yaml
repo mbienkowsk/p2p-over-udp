@@ -1,0 +1,34 @@
+services:
+  client1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: client1
+    expose:
+      - "8000/udp"
+    networks:
+      - p2p-net
+    command: just run ./host1_resources log1.log
+  client2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: client2
+    expose:
+      - "8000/udp"
+    networks:
+      - p2p-net
+    command: just run ./host2_resources log2.log
+  client3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: client3
+    expose:
+      - "8000/udp"
+    networks:
+      - p2p-net
+    command: just run ./host3_resources log3.log
+networks:
+  p2p-net:
+    driver: bridge

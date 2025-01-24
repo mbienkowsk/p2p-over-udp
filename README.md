@@ -26,6 +26,8 @@ just lint
 
 ### Docker
 
+## Dockerfile
+
 zbudowanie kontenera
 
 ```bash
@@ -45,13 +47,52 @@ docker run psi-projekt:latest [ run/build/lint/test ]
 docker build . -t psi-projekt
 
 # Zawsze działa na aktualnym kodzie z katalogu roboczego.
-docker run --rm -v ./:/app/ -it psi-projekt:latest [ run/build/lint/test ]
+docker run --rm -v ./:/app/ -it psi-projekt:latest just [ run/build/lint/test ]
 
 # Przykład. Uruchomienie `just format` w kontenerze, sformatuje kod na lokalnej maszynie. Bez konieczności instalowania narzędzi.
-docker run --rm -v ./:/app/ -it psi-projekt:latest format
+docker run --rm -v ./:/app/ -it psi-projekt:latest just format
 ```
+
+## Compose
+
+zawiera 2 targety do 2 klientów. Przydatne jest uruchomienie shella, żeby pogrzebać w cwd żeby zawartość host_resources się różniła:
+
+```bash
+docker compose run --rm --service-ports --build clientX sh
+```
+
+Uruchomienie kontenera:
+
+```bash
+docker compose up --rm --service-ports --build clientX
+```
+
+Uruchamiamy na oddzielnych terminalach, powinny się widzeć i współpracować.
 
 ### Biblioteki do dociągnięcia do pracy lokalnej
 
 * [boost](https://www.boost.org/) (`sudo apt install libboost-all-dev`)
 * [spdlog](https://github.com/gabime/spdlog) (`sudo apt install libspdlog-dev`)
+
+
+### Uruchamianie testowe
+
+Budowa bazowego obrazu dla wszystkich klientów z wymaganymi toolchainami:
+```bash
+docker build -t psi-projekt .
+```
+
+Utworzenie sieci:
+```bash
+docker network create psi-projekt_p2p_network
+```
+
+Uruchomienie powłoki klienta 1:
+```bash
+docker run --rm -it --name client1 --network psi-projekt_p2p_network -v ./:/app/ psi-projekt bash
+```
+
+Uruchomienie powłoki klienta 2:
+```bash
+docker run --rm -it --name client2 --network psi-projekt_p2p_network -v ./:/app/ psi-projekt bash
+```

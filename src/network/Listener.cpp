@@ -1,0 +1,211 @@
+#include "Listener.h"
+#include "Downloader.h"
+#include "UdpSender.h"
+#include "constants.h"
+#include <arpa/inet.h>
+#include <asm-generic/socket.h>
+#include <cstring>
+#include <fmt/ranges.h>
+#include <fstream>
+#include <iostream>
+#include <memory>
+#include <spdlog/spdlog.h>
+#include <stdexcept>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <vector>
+
+UdpListener::UdpListener(
+    int port, std::shared_ptr<LocalResourceManager> localResourceManager,
+    std::shared_ptr<PeerResourceMap> peerResourceMap,
+    const std::string &myAddress)
+    : peerResourceMap(peerResourceMap),
+      localResourceManager(localResourceManager), port(port), sockfd(-1),
+      myAddress(myAddress) {}
+
+UdpListener::~UdpListener() {
+    if (sockfd >= 0) {
+        close(sockfd);
+    }
+}
+
+void UdpListener::start() {
+    tryCreateSocket();
+    tryBindSocket();
+    setSockOptions();
+    spdlog::info("Listening on port {} for incoming UDP traffic...\n", port);
+}
+
+void UdpListener::listen(SABool stop) {
+    checkSockInit();
+
+    char buffer[MAX_MSG_SIZE];
+
+    while (!*stop) {
+        auto receivedPacket = tryRecv(buffer);
+        if (receivedPacket.nBytes < 0) {
+            // already logged it
+            continue;
+        }
+
+        // copying this
+        std::vector<std::byte> rawData(receivedPacket.nBytes);
+        std::memcpy(rawData.data(), buffer, receivedPacket.nBytes);
+
+        try {
+            handleMessage(Message::from_bytes(rawData), receivedPacket.senderIp,
+                          receivedPacket.senderPort);
+        } catch (const std::exception &ex) {
+            std::cerr << "Failed to parse message: " << ex.what() << std::endl;
+        }
+    }
+}
+std::thread UdpListener::detached_listen(SABool stop) {
+    return std::thread(&UdpListener::listen, this, stop);
+}
+
+void UdpListener::handleMessage(std::unique_ptr<Message> message,
+                                const std::string &senderIp,
+                                const uint16_t &senderPort) {
+
+    if (senderIp == myAddress) {
+        spdlog::trace("Ignoring message from self");
+        return;
+    }
+
+    auto resource = message.get();
+    switch (resource->header.messageType) {
+    case MessageType::RESOURCE_ANNOUNCE: {
+        auto resourceAnnounce =
+            dynamic_cast<ResourceAnnounceMessage *>(message.get());
+        peerResourceMap->updateResources(senderIp,
+                                         resourceAnnounce->resourceNames);
+        // Log
+        spdlog::info("Updated resources for {}: {}", senderIp,
+                     fmt::join(resourceAnnounce->resourceNames, ", "));
+        break;
+    }
+    case MessageType::RESOURCE_REQUEST: {
+        auto resourceRequest =
+            dynamic_cast<ResourceRequestMessage *>(message.get());
+        spdlog::info("Received resource request for: {} from {}:{}",
+                     resourceRequest->resource_name, senderIp, senderPort);
+
+        if (!localResourceManager->resourceExists(
+                resourceRequest->resource_name)) {
+            spdlog::warn("Resource not found: {}",
+                         resourceRequest->resource_name);
+            return;
+        }
+
+        std::vector<std::byte> resourceData =
+            localResourceManager->getResource(resourceRequest->resource_name);
+
+        UdpSender sender(senderIp, PORT);
+        spdlog::trace("Sending resource data for: {}",
+                      resourceRequest->resource_name);
+        auto header = Header(MessageType::RESOURCE_DATA);
+        sender.sendMessage(ResourceDataMessage(
+            header, resourceRequest->resource_name, resourceData));
+        break;
+    }
+    case MessageType::RESOURCE_DATA: {
+        auto resourceData = dynamic_cast<ResourceDataMessage *>(message.get());
+        spdlog::info("Received resource data for: {}",
+                     resourceData->resourceName);
+
+        std::string filePath = localResourceManager->getResourceFolder() + "/" +
+                               resourceData->resourceName;
+
+        try {
+            std::ofstream outFile(filePath, std::ios::binary);
+            if (!outFile) {
+                throw std::runtime_error("Failed to open file for writing: " +
+                                         filePath);
+            }
+
+            // Write the resource data to the file
+            outFile.write(reinterpret_cast<const char *>(
+                              resourceData->resourceData.data()),
+                          resourceData->resourceData.size());
+            outFile.close();
+
+            spdlog::info("Resource saved to: {}", filePath);
+
+            auto downloader =
+                Downloader::getRunningDownload(resourceData->resourceName);
+            if (downloader) {
+                downloader->stop();
+                spdlog::info("Download completed for resource: {}",
+                             resourceData->resourceName);
+            }
+        } catch (const std::exception &ex) {
+            spdlog::error("Failed to save resource '{}': {}",
+                          resourceData->resourceName, ex.what());
+        }
+        break;
+    }
+    default:
+        std::cout << "Unknown Message Type" << std::endl;
+        break;
+    }
+}
+
+void UdpListener::checkSockInit() const {
+    if (sockfd < 0) {
+        std::cerr << "Socket is not initialized. Call start() first."
+                  << std::endl;
+        return;
+    }
+}
+
+void UdpListener::tryCreateSocket() {
+    sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sockfd < 0) {
+        throw std::runtime_error("Failed to create socket");
+    }
+}
+
+void UdpListener::tryBindSocket() {
+    sockaddr_in serverAddr{};
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_addr.s_addr = INADDR_ANY;
+    serverAddr.sin_port = htons(port);
+
+    if (bind(sockfd, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0) {
+        close(sockfd);
+        throw std::runtime_error("Failed to bind socket");
+    }
+}
+
+UdpListener::ReceivedPacket UdpListener::tryRecv(char *buffer) {
+    sockaddr_in clientAddr{};
+    socklen_t clientAddrLen = sizeof(clientAddr);
+
+    ssize_t received = recvfrom(sockfd, buffer, MAX_MSG_SIZE, 0,
+                                (struct sockaddr *)&clientAddr, &clientAddrLen);
+
+    // Print the sender's address
+    char clientIp[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &clientAddr.sin_addr, clientIp, INET_ADDRSTRLEN);
+
+    if (received >= 0) {
+        spdlog::info("Received {} bytes from {}:{}", received, clientIp,
+                     ntohs(clientAddr.sin_port));
+    }
+    // return received;
+    UdpListener::ReceivedPacket receivedPacket = {};
+    receivedPacket.nBytes = received;
+    receivedPacket.senderIp = std::string(clientIp);
+    receivedPacket.senderPort = ntohs(clientAddr.sin_port);
+    return receivedPacket;
+}
+
+SMap UdpListener::runningDownloads;
+
+void UdpListener::setSockOptions() {
+    if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &UdpListener::TIMEOUT,
+                   sizeof(UdpListener::TIMEOUT)) < 0) {
+        throw std::runtime_error("Failed to set socket options");
+    }
+}

@@ -10,10 +10,37 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/tests)
 
-add_library(network_lib ${SOURCE_DIR}/network/Header.cpp ${SOURCE_DIR}/network/Message.cpp ${SOURCE_DIR}/serialization/Utils.cpp)
+add_library(network_lib
+    ${SOURCE_DIR}/network/Header.cpp
+    ${SOURCE_DIR}/network/Message.cpp
+    ${SOURCE_DIR}/network/Listener.cpp
+    ${SOURCE_DIR}/network/UdpSender.cpp
+    ${SOURCE_DIR}/serialization/Utils.cpp
+    ${SOURCE_DIR}/network/ThreadSafeHashMap.cpp
+    ${SOURCE_DIR}/resources/PeerResourceMap.cpp
+    ${SOURCE_DIR}/resources/LocalResourceManager.cpp
+    ${SOURCE_DIR}/cli/Cli.cpp
+    ${SOURCE_DIR}/network/Downloader.cpp
+    ${SOURCE_DIR}/network/constants.h
+)
 
 # Define sources and executable
-set(SOURCES ${SOURCE_DIR}/main.cpp ${SOURCE_DIR}/network/Header.cpp ${SOURCE_DIR}/serialization/Utils.cpp ${SOURCE_DIR}/network/Message.cpp ${SOURCE_DIR}/network/BroadcastSender.cpp)
+set(SOURCES
+    ${SOURCE_DIR}/main.cpp
+    ${SOURCE_DIR}/network/Header.cpp
+    ${SOURCE_DIR}/serialization/Utils.cpp
+    ${SOURCE_DIR}/network/Message.cpp
+    ${SOURCE_DIR}/network/BroadcastSender.cpp
+    ${SOURCE_DIR}/cli/Cli.cpp
+    ${SOURCE_DIR}/log/Log.h
+    ${SOURCE_DIR}/network/Listener.cpp
+    ${SOURCE_DIR}/network/UdpSender.cpp
+    ${SOURCE_DIR}/network/ThreadSafeHashMap.cpp
+    ${SOURCE_DIR}/resources/PeerResourceMap.cpp
+    ${SOURCE_DIR}/resources/LocalResourceManager.cpp
+    ${SOURCE_DIR}/network/Downloader.cpp
+)
+
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 
@@ -25,22 +52,11 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     -pedantic
     -pedantic-errors
 )
-target_link_options(${PROJECT_NAME} PRIVATE
-    -fsanitize=address
-    -fsanitize=undefined
-    -fsanitize=leak
-)
+# target_link_options(${PROJECT_NAME} PRIVATE
+#     -fsanitize=undefined
+#     -fsanitize=leak
+# )
 
-# Link boost
-find_package(Boost 1.71.0 COMPONENTS filesystem system REQUIRED)
-
-# Include Boost headers
-if(Boost_FOUND)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${Boost_LIBRARIES})
-else()
-    message(FATAL_ERROR "Boost not found")
-endif()
 
 # Link spdlog
 find_package(spdlog REQUIRED)
