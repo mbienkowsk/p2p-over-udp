@@ -21,8 +21,6 @@
 #include <thread>
 #include <unistd.h>
 
-#define RESOURCE_FOLDER "./test"
-
 /// Cleanup function that waits for the subthreads to finish and logs
 /// the progress
 void cleanup(std::thread &listenerThread, std::thread &broadcastThread,
