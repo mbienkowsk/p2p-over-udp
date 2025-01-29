@@ -8,7 +8,7 @@
 class LocalResourceManager {
   private:
     std::string folder_;
-    static const int MAX_FILE_SIZE = 65501;
+    static const int MAX_FILE_SIZE = 65249;
 
   public:
     LocalResourceManager(const std::string &folderPath);
