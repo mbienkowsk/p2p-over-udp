@@ -22,7 +22,7 @@ std::vector<std::string> LocalResourceManager::listResources() const {
 
     // check all resources in folder
     for (const auto &entry : std::filesystem::directory_iterator(folder_)) {
-        if (entry.is_regular_file()) {
+        if (entry.is_regular_file() && entry.file_size() <= MAX_FILE_SIZE) {
             resourceNames.push_back(entry.path().filename().string());
         }
     }
