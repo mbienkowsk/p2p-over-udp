@@ -6,3 +6,5 @@ build
 host_resources
 host1_resources/l
 host1_resources/s
+host1_resources/max_size
+host1_resources/too_large
