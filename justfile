@@ -12,6 +12,9 @@ run_1:
 run_2:
   just run /app/host2_resources p2p.log
 
+run_3:
+  just run /app/host3_resources p3p.log
+
 # Build the test executable
 build_tests:
   cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=./Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_STANDARD=20 ..
