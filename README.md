@@ -1,103 +1,23 @@
-## Praca z aplikacją
+# P2P over UDP
 
-uruchomienie przez [just](https://github.com/casey/just) (`curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin`)
+This project is a peer-to-peer file sharing application implemented in C++. It allows multiple clients to share files directly over a local network, without the need for a central server. Each client can select files to share, discover other clients, and download files from them.
 
-```bash
-just run
-```
+## Features
 
-zbudowanie
+- Peer-to-peer file sharing between multiple clients
+- Automatic discovery of other clients on the local network
+- Selection of files to share via dedicated resource directories
+- Download files from other clients
+- Simple command-line interface for running, building, testing, and linting
 
-```bash
-just build
-```
+## Usage
 
-uruchomienie testów
+### Prerequisites
 
-```bash
-just test
-```
+- C++ compiler (with C++17 support)
+- [spdlog](https://github.com/gabime/spdlog) logging library (`sudo apt install libspdlog-dev`)
+- [just](https://github.com/casey/just) command runner
 
-linter
+## Usage
 
-```bash
-just lint
-```
-
-### Docker
-
-**uwaga: uruchomienie projektu przez compose wymaga utworzenia w katalogu źródłowym projektu po jednym katalogu hostX_resources na każdego
-uruchamianego klienta. Te katalogi należy spopulować wybranymi plikami.**
-
-## Compose
-
-zawiera 3 targety do 3 klientów.
-
-```bash
-docker compose run --rm --service-ports --build clientX sh
-```
-
-Uruchomienie kontenera:
-
-```bash
-docker compose up --rm --service-ports --build clientX
-```
-
-Uruchamiamy na oddzielnych terminalach, powinny się widzeć i współpracować.
-
-### Biblioteki do dociągnięcia do pracy lokalnej
-
-* [spdlog](https://github.com/gabime/spdlog) (`sudo apt install libspdlog-dev`)
-
-### Uruchamianie testowe
-
-Budowa bazowego obrazu dla wszystkich klientów z wymaganymi toolchainami:
-
-```bash
-docker build -t psi-projekt .
-```
-
-Utworzenie sieci:
-
-```bash
-docker network create psi-projekt_p2p_network
-```
-
-Uruchomienie powłoki klienta 1:
-
-```bash
-docker run --rm -it --name client1 --network psi-projekt_p2p_network -v ./:/app/ psi-projekt bash
-```
-
-Uruchomienie powłoki klienta 2:
-
-```bash
-docker run --rm -it --name client2 --network psi-projekt_p2p_network -v ./:/app/ psi-projekt bash
-```
-
-## Dockerfile
-
-zbudowanie kontenera
-
-```bash
-docker build . -t psi-projekt
-```
-
-entrypoint to just, komendy run/build/lint/test przekazuje się przy uruchomieniu:
-
-```bash
-docker run psi-projekt:latest [ run/build/lint/test ]
-```
-
-żeby pracować nad projektem bez konieczności instalowania wszystkich bibliotek i przebudowywania obrazu, można podmontować katalog z projektem do kontenera:
-
-```bash
-# tylko raz.
-docker build . -t psi-projekt
-
-# Zawsze działa na aktualnym kodzie z katalogu roboczego.
-docker run --rm -v ./:/app/ -it psi-projekt:latest just [ run/build/lint/test ]
-
-# Przykład. Uruchomienie `just format` w kontenerze, sformatuje kod na lokalnej maszynie. Bez konieczności instalowania narzędzi.
-docker run --rm -v ./:/app/ -it psi-projekt:latest just format
-```
+For detailed build and usage instructions, Docker usage, and advanced options, see [docs/build.md](build.md).
